@@ -1,8 +1,8 @@
 import { Header } from "@/components/Header";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
-import { Plane, AlertTriangle, CheckCircle, Clock } from "lucide-react";
+import { Plane, AlertTriangle, CheckCircle, Clock, TrendingUp, Wrench, BarChart3 } from "lucide-react";
 import a350Image from "@/assets/a350.jpg";
 import a380Image from "@/assets/a380.jpg";
 import boeing777_300Image from "@/assets/777-300er.jpeg";
@@ -118,14 +118,222 @@ const getStatusBadge = (status: string) => {
 };
 
 const Fleet = () => {
+  // Calculate fleet statistics
+  const totalAircraft = fleetData.length;
+  const operationalCount = fleetData.filter(a => a.status === "operational").length;
+  const maintenanceCount = fleetData.filter(a => a.status === "maintenance").length;
+  const scheduledCount = fleetData.filter(a => a.status === "scheduled").length;
+  const totalWarnings = fleetData.reduce((sum, a) => sum + a.warnings, 0);
+  const totalFlightHours = fleetData.reduce((sum, a) => sum + a.flightHours, 0);
+  const avgFlightHours = Math.round(totalFlightHours / totalAircraft);
+  
+  // Count by model
+  const modelCounts: Record<string, number> = {};
+  fleetData.forEach(aircraft => {
+    modelCounts[aircraft.model] = (modelCounts[aircraft.model] || 0) + 1;
+  });
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
       <Header />
       
       <main className="container mx-auto px-4 pt-24 pb-12">
         <div className="mb-8">
-          <h2 className="text-3xl font-bold text-foreground mb-2">Fleet Overview</h2>
-          <p className="text-muted-foreground">Monitor and manage your entire aircraft fleet</p>
+          <h2 className="text-3xl font-bold text-foreground mb-2">Fleet Overview Dashboard</h2>
+          <p className="text-muted-foreground">Real-time monitoring and analytics for your entire aircraft fleet</p>
+        </div>
+
+        {/* Key Metrics Dashboard */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <Card className="bg-card/60 backdrop-blur-sm border-border/50">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                <Plane className="h-4 w-4" />
+                Total Aircraft
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-foreground">{totalAircraft}</div>
+              <p className="text-xs text-muted-foreground mt-1">Active fleet units</p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-card/60 backdrop-blur-sm border-border/50">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                <CheckCircle className="h-4 w-4" />
+                Operational Status
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-green-500">{operationalCount}</div>
+              <div className="flex gap-2 mt-2 text-xs">
+                <span className="text-muted-foreground">Maintenance: <span className="text-destructive font-semibold">{maintenanceCount}</span></span>
+                <span className="text-muted-foreground">Scheduled: <span className="text-blue-500 font-semibold">{scheduledCount}</span></span>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-card/60 backdrop-blur-sm border-border/50">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                <Clock className="h-4 w-4" />
+                Flight Hours
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-foreground">{totalFlightHours.toLocaleString()}</div>
+              <p className="text-xs text-muted-foreground mt-1">Avg: {avgFlightHours.toLocaleString()} hrs/aircraft</p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-card/60 backdrop-blur-sm border-border/50">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4" />
+                Active Warnings
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className={`text-3xl font-bold ${totalWarnings > 0 ? 'text-warning' : 'text-green-500'}`}>
+                {totalWarnings}
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                {totalWarnings === 0 ? 'All systems nominal' : 'Requires attention'}
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Fleet Composition and Maintenance Schedule */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          <Card className="bg-card/60 backdrop-blur-sm border-border/50">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BarChart3 className="h-5 w-5 text-primary" />
+                Fleet Composition
+              </CardTitle>
+              <CardDescription>Aircraft breakdown by model type</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {Object.entries(modelCounts).map(([model, count]) => (
+                <div key={model} className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-foreground">{model}</span>
+                    <span className="text-sm text-muted-foreground">{count} aircraft</span>
+                  </div>
+                  <div className="h-2 bg-secondary rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-primary transition-all"
+                      style={{ width: `${(count / totalAircraft) * 100}%` }}
+                    />
+                  </div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+
+          <Card className="bg-card/60 backdrop-blur-sm border-border/50">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Wrench className="h-5 w-5 text-primary" />
+                Upcoming Maintenance
+              </CardTitle>
+              <CardDescription>Next scheduled maintenance activities</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {fleetData
+                  .filter(a => a.nextMaintenance !== "In Progress")
+                  .sort((a, b) => new Date(a.nextMaintenance).getTime() - new Date(b.nextMaintenance).getTime())
+                  .slice(0, 5)
+                  .map((aircraft) => (
+                    <Link 
+                      key={aircraft.id} 
+                      to={`/aircraft/${aircraft.id}`}
+                      className="flex items-center justify-between p-3 border border-border/50 rounded-lg hover:border-primary/50 transition-colors"
+                    >
+                      <div className="flex items-center gap-3">
+                        <Plane className="h-4 w-4 text-primary" />
+                        <div>
+                          <p className="text-sm font-medium text-foreground">{aircraft.id}</p>
+                          <p className="text-xs text-muted-foreground">{aircraft.model}</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-medium text-foreground">{aircraft.nextMaintenance}</p>
+                        <Badge variant="outline" className="text-xs">{aircraft.location}</Badge>
+                      </div>
+                    </Link>
+                  ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Status Overview Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <Card className="bg-card/60 backdrop-blur-sm border-green-500/30">
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <CheckCircle className="h-5 w-5 text-green-500" />
+                Operational
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-4xl font-bold text-green-500 mb-4">{operationalCount}</div>
+              <div className="space-y-1">
+                {fleetData.filter(a => a.status === "operational").map(a => (
+                  <Link key={a.id} to={`/aircraft/${a.id}`} className="block text-sm text-muted-foreground hover:text-foreground transition-colors">
+                    {a.id} - {a.location}
+                  </Link>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-card/60 backdrop-blur-sm border-destructive/30">
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Wrench className="h-5 w-5 text-destructive" />
+                In Maintenance
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-4xl font-bold text-destructive mb-4">{maintenanceCount}</div>
+              <div className="space-y-1">
+                {fleetData.filter(a => a.status === "maintenance").map(a => (
+                  <Link key={a.id} to={`/aircraft/${a.id}`} className="block text-sm text-muted-foreground hover:text-foreground transition-colors">
+                    {a.id} - {a.warnings} warning{a.warnings !== 1 ? 's' : ''}
+                  </Link>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-card/60 backdrop-blur-sm border-blue-500/30">
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Clock className="h-5 w-5 text-blue-500" />
+                Scheduled
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-4xl font-bold text-blue-500 mb-4">{scheduledCount}</div>
+              <div className="space-y-1">
+                {fleetData.filter(a => a.status === "scheduled").map(a => (
+                  <Link key={a.id} to={`/aircraft/${a.id}`} className="block text-sm text-muted-foreground hover:text-foreground transition-colors">
+                    {a.id} - {a.nextMaintenance}
+                  </Link>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="mb-6">
+          <h3 className="text-2xl font-bold text-foreground mb-2">All Aircraft</h3>
+          <p className="text-muted-foreground">Click on any aircraft for detailed information</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
