@@ -17,8 +17,8 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/fleet" element={<Fleet />} />
+          <Route path="/" element={<Fleet />} />
+          <Route path="/monitor" element={<Index />} />
           <Route path="/aircraft/:id" element={<AircraftDetail />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
