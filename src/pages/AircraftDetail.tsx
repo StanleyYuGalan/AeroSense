@@ -539,6 +539,66 @@ const AircraftDetail = () => {
   const { id } = useParams<{ id: string }>();
   const aircraft = id ? aircraftDatabase[id] : null;
   const [selectedMaintenance, setSelectedMaintenance] = useState<typeof maintenanceHistory[0] | null>(null);
+  const [selectedDocument, setSelectedDocument] = useState<any>(null);
+
+  const aircraftDocuments = [
+    { 
+      name: "Airworthiness Certificate", 
+      date: "Valid until 2025-12-31", 
+      type: "Certification",
+      issuedBy: "GCAA - General Civil Aviation Authority",
+      certificateNumber: "AWC-2024-A350-342",
+      content: "This is to certify that the aircraft Airbus A350-900, registration A6-EDA, serial number MSN-342, has been inspected and found to be airworthy in accordance with the applicable airworthiness requirements."
+    },
+    { 
+      name: "Certificate of Registration", 
+      date: "Issued 2019-04-20", 
+      type: "Legal",
+      issuedBy: "UAE Civil Aviation Authority",
+      certificateNumber: "REG-UAE-A6-EDA",
+      content: "This certificate confirms that the aircraft Airbus A350-900, manufacturer serial number MSN-342, is duly registered in the name of Emirates Airline in the UAE Aircraft Register under registration mark A6-EDA."
+    },
+    { 
+      name: "Noise Certificate", 
+      date: "Valid until 2025-04-20", 
+      type: "Compliance",
+      issuedBy: "EASA - European Aviation Safety Agency",
+      certificateNumber: "NC-2024-A350-342",
+      content: "This certificate verifies that the aircraft meets the noise standards specified in ICAO Annex 16, Volume I, Chapter 14. Maximum noise levels: Takeoff 89.3 EPNdB, Approach 97.1 EPNdB, Lateral 94.8 EPNdB."
+    },
+    { 
+      name: "Radio License", 
+      date: "Valid until 2026-04-20", 
+      type: "Operational",
+      issuedBy: "UAE Telecommunications Regulatory Authority",
+      certificateNumber: "RL-2024-A6-EDA",
+      content: "Authorization is granted for the operation of radio equipment on aircraft A6-EDA. Authorized frequencies: VHF 118.0-136.975 MHz, HF 2.85-22.0 MHz, Satellite Communication authorized."
+    },
+    { 
+      name: "Insurance Certificate", 
+      date: "Valid until 2024-12-31", 
+      type: "Insurance",
+      issuedBy: "Global Aviation Insurance Ltd.",
+      certificateNumber: "INS-2024-EDA-001",
+      content: "This certificate provides evidence of insurance coverage for aircraft A6-EDA. Hull Value: $300,000,000 USD. Liability Coverage: $2,000,000,000 USD per occurrence. Coverage includes: Hull All Risks, Third Party Liability, War & Allied Perils."
+    },
+    { 
+      name: "Maintenance Program Manual", 
+      date: "Rev 5.2 - 2024-01-01", 
+      type: "Technical",
+      issuedBy: "Emirates Engineering",
+      certificateNumber: "MPM-A350-Rev5.2",
+      content: "This manual outlines the approved maintenance program for A6-EDA. Includes: A-Check intervals (600 FH), B-Check intervals (6000 FH), C-Check intervals (24 months), Major structural inspections, Component life limits, and special inspections."
+    },
+    { 
+      name: "Flight Operations Manual", 
+      date: "Rev 12.1 - 2024-01-01", 
+      type: "Operational",
+      issuedBy: "Emirates Flight Operations",
+      certificateNumber: "FOM-A350-Rev12.1",
+      content: "Standard Operating Procedures for A350-900 operations. Covers: Normal procedures, Non-normal procedures, Performance data, Weight & Balance, Route-specific procedures, MEL/CDL procedures, and Emergency procedures."
+    },
+  ];
 
   if (!aircraft) {
   return (
@@ -1099,23 +1159,19 @@ const AircraftDetail = () => {
           </Dialog>
 
           <TabsContent value="documents">
-            <Card className="bg-card/60 backdrop-blur-sm">
+            <Card className="bg-card/40 backdrop-blur-md">
               <CardHeader>
                 <CardTitle>Aircraft Documentation</CardTitle>
-                <CardDescription>Certifications, manuals, and compliance documents</CardDescription>
+                <CardDescription>Certifications, manuals, and compliance documents (Click to view)</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {[
-                    { name: "Airworthiness Certificate", date: "Valid until 2025-12-31", type: "Certification" },
-                    { name: "Certificate of Registration", date: "Issued 2019-04-20", type: "Legal" },
-                    { name: "Noise Certificate", date: "Valid until 2025-04-20", type: "Compliance" },
-                    { name: "Radio License", date: "Valid until 2026-04-20", type: "Operational" },
-                    { name: "Insurance Certificate", date: "Valid until 2024-12-31", type: "Insurance" },
-                    { name: "Maintenance Program Manual", date: "Rev 5.2 - 2024-01-01", type: "Technical" },
-                    { name: "Flight Operations Manual", date: "Rev 12.1 - 2024-01-01", type: "Operational" },
-                  ].map((doc, index) => (
-                    <div key={index} className="flex items-center justify-between p-4 border border-border/50 rounded-lg hover:border-primary/50 transition-colors cursor-pointer">
+                  {aircraftDocuments.map((doc, index) => (
+                    <div 
+                      key={index} 
+                      onClick={() => setSelectedDocument(doc)}
+                      className="flex items-center justify-between p-4 border border-border/50 rounded-lg hover:border-primary/50 transition-colors cursor-pointer hover:bg-muted/30"
+                    >
                       <div className="flex items-center gap-3">
                         <FileText className="h-5 w-5 text-primary" />
                         <div>
@@ -1130,6 +1186,128 @@ const AircraftDetail = () => {
               </CardContent>
             </Card>
           </TabsContent>
+
+          {/* Document Viewer Modal */}
+          <Dialog open={!!selectedDocument} onOpenChange={() => setSelectedDocument(null)}>
+            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-card/95 backdrop-blur-xl border-border/30">
+              <DialogHeader>
+                <DialogTitle className="text-2xl flex items-center gap-3">
+                  <FileText className="h-6 w-6 text-primary" />
+                  {selectedDocument?.name}
+                </DialogTitle>
+                <DialogDescription>
+                  Official aircraft documentation
+                </DialogDescription>
+              </DialogHeader>
+
+              {selectedDocument && (
+                <div className="space-y-6 mt-4">
+                  {/* Document Header */}
+                  <div className="border-2 border-primary/30 bg-gradient-to-r from-primary/5 to-primary/10 p-6 rounded-lg">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-xs text-muted-foreground uppercase mb-1">Document Type</p>
+                        <Badge variant="secondary" className="text-sm">{selectedDocument.type}</Badge>
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground uppercase mb-1">Certificate Number</p>
+                        <p className="font-mono text-sm font-semibold text-foreground">{selectedDocument.certificateNumber}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground uppercase mb-1">Issued By</p>
+                        <p className="text-sm font-medium text-foreground">{selectedDocument.issuedBy}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground uppercase mb-1">Validity</p>
+                        <p className="text-sm font-medium text-foreground">{selectedDocument.date}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Document Content */}
+                  <div className="bg-white text-gray-900 p-8 rounded-lg shadow-inner border-2 border-border/30 min-h-[400px]">
+                    {/* Document Header */}
+                    <div className="text-center mb-8 pb-4 border-b-2 border-gray-300">
+                      <div className="mb-2">
+                        <Plane className="h-12 w-12 mx-auto text-primary" />
+                      </div>
+                      <h2 className="text-2xl font-bold text-gray-900 mb-2">{selectedDocument.name}</h2>
+                      <p className="text-sm text-gray-600">{selectedDocument.issuedBy}</p>
+                      <p className="text-xs text-gray-500 mt-1">Certificate No: {selectedDocument.certificateNumber}</p>
+                    </div>
+
+                    {/* Aircraft Information */}
+                    <div className="mb-6 p-4 bg-gray-50 rounded border border-gray-200">
+                      <h3 className="font-bold text-gray-900 mb-3 text-sm uppercase">Aircraft Information</h3>
+                      <div className="grid grid-cols-2 gap-3 text-sm">
+                        <div>
+                          <span className="text-gray-600">Registration:</span>
+                          <span className="font-semibold text-gray-900 ml-2">{aircraft.id}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-600">Type:</span>
+                          <span className="font-semibold text-gray-900 ml-2">{aircraft.model}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-600">Serial Number:</span>
+                          <span className="font-semibold text-gray-900 ml-2">{aircraft.serialNumber}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-600">Operator:</span>
+                          <span className="font-semibold text-gray-900 ml-2">Emirates Airline</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Document Body */}
+                    <div className="mb-8">
+                      <p className="text-gray-800 leading-relaxed text-justify">
+                        {selectedDocument.content}
+                      </p>
+                    </div>
+
+                    {/* Signature Section */}
+                    <div className="mt-8 pt-6 border-t-2 border-gray-300">
+                      <div className="grid grid-cols-2 gap-8">
+                        <div>
+                          <p className="text-xs text-gray-600 mb-3">Issue Date</p>
+                          <p className="font-semibold text-gray-900">{selectedDocument.date.split(' ')[1] || selectedDocument.date}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-600 mb-3">Authorized Signature</p>
+                          <div className="border-b-2 border-gray-400 pb-1 mb-1">
+                            <p className="font-signature text-2xl text-gray-700 italic">Authorized Officer</p>
+                          </div>
+                          <p className="text-xs text-gray-600">{selectedDocument.issuedBy}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Document Footer */}
+                    <div className="mt-8 pt-4 border-t border-gray-300 text-center">
+                      <p className="text-xs text-gray-500">
+                        This is an official document. Any alteration or unauthorized reproduction is prohibited.
+                      </p>
+                      <p className="text-xs text-gray-400 mt-1">
+                        Document ID: {selectedDocument.certificateNumber} | Generated: {new Date().toLocaleDateString()}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Document Actions */}
+                  <div className="flex gap-3 justify-end">
+                    <Badge variant="outline" className="cursor-pointer hover:bg-muted">
+                      <FileText className="h-3 w-3 mr-1" />
+                      Download PDF
+                    </Badge>
+                    <Badge variant="outline" className="cursor-pointer hover:bg-muted">
+                      Print Document
+                    </Badge>
+                  </div>
+                </div>
+              )}
+            </DialogContent>
+          </Dialog>
 
           <TabsContent value="specs">
             <Card className="bg-card/60 backdrop-blur-sm">
