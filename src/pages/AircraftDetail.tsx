@@ -539,7 +539,7 @@ const AircraftDetail = () => {
 
         {/* Warning Messages - Front and Center */}
         {aircraft.warnings > 0 && aircraft.warningDetails && (
-          <Alert variant="destructive" className="mb-8 border-2 border-warning bg-warning/10 backdrop-blur-sm">
+          <Alert variant="destructive" className="mb-8 border-2 border-warning/30 bg-warning/10 backdrop-blur-md backdrop-saturate-150">
             <AlertTriangle className="h-6 w-6" />
             <AlertTitle className="text-xl font-bold mb-4">
               {aircraft.warnings} Active Warning{aircraft.warnings > 1 ? "s" : ""} - Immediate Attention Required
@@ -547,7 +547,7 @@ const AircraftDetail = () => {
             <AlertDescription>
               <div className="space-y-4">
                 {aircraft.warningDetails.map((warning: any) => (
-                  <Card key={warning.id} className="border-warning/50 bg-background/80">
+                  <Card key={warning.id} className="border-warning/30 bg-background/60 backdrop-blur-md">
                     <CardContent className="p-4">
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex items-start gap-3">
@@ -587,7 +587,7 @@ const AircraftDetail = () => {
 
         {/* Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          <Card className="bg-card/60 backdrop-blur-sm">
+          <Card className="bg-card/30 backdrop-blur-lg border-border/30">
             <CardContent className="p-6">
               <div className="flex items-center gap-3">
                 <MapPin className="h-5 w-5 text-primary" />
@@ -599,7 +599,7 @@ const AircraftDetail = () => {
             </CardContent>
           </Card>
           
-          <Card className="bg-card/60 backdrop-blur-sm">
+          <Card className="bg-card/30 backdrop-blur-lg border-border/30">
             <CardContent className="p-6">
               <div className="flex items-center gap-3">
                 <Clock className="h-5 w-5 text-primary" />
@@ -611,7 +611,7 @@ const AircraftDetail = () => {
             </CardContent>
           </Card>
           
-          <Card className="bg-card/60 backdrop-blur-sm">
+          <Card className="bg-card/30 backdrop-blur-lg border-border/30">
             <CardContent className="p-6">
               <div className="flex items-center gap-3">
                 <Wrench className="h-5 w-5 text-primary" />
@@ -623,7 +623,7 @@ const AircraftDetail = () => {
             </CardContent>
           </Card>
           
-          <Card className="bg-card/60 backdrop-blur-sm">
+          <Card className="bg-card/30 backdrop-blur-lg border-border/30">
             <CardContent className="p-6">
               <div className="flex items-center gap-3">
                 <Calendar className="h-5 w-5 text-primary" />

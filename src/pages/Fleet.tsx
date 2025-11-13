@@ -202,7 +202,7 @@ const Fleet = () => {
             <div className="h-[calc(100vh-280px)] overflow-y-auto space-y-4 pr-2 scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
               {fleetData.map((aircraft) => (
                 <Link key={aircraft.id} to={`/aircraft/${aircraft.id}`}>
-                  <Card className="overflow-hidden bg-card/60 backdrop-blur-sm border-border/50 hover:border-primary/50 transition-all cursor-pointer hover:shadow-lg">
+                  <Card className="overflow-hidden bg-card/30 backdrop-blur-lg border-border/30 hover:border-primary/50 transition-all cursor-pointer hover:shadow-lg">
                     <div className="flex">
                       <div className="relative w-32 h-32 flex-shrink-0 overflow-hidden">
                         <img 
@@ -257,9 +257,9 @@ const Fleet = () => {
 
           {/* Right Column - Dashboard */}
           <div className="space-y-8">
-            {/* Key Metrics Dashboard */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <Card className="bg-card/60 backdrop-blur-sm border-border/50">
+        {/* Key Metrics Dashboard */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <Card className="bg-card/30 backdrop-blur-lg border-border/30">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                 <Plane className="h-4 w-4" />
@@ -272,7 +272,7 @@ const Fleet = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-card/60 backdrop-blur-sm border-border/50">
+          <Card className="bg-card/30 backdrop-blur-lg border-border/30">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                 <CheckCircle className="h-4 w-4" />
@@ -288,7 +288,7 @@ const Fleet = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-card/60 backdrop-blur-sm border-border/50">
+          <Card className="bg-card/30 backdrop-blur-lg border-border/30">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                 <Clock className="h-4 w-4" />
@@ -301,7 +301,7 @@ const Fleet = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-card/60 backdrop-blur-sm border-border/50">
+          <Card className="bg-card/30 backdrop-blur-lg border-border/30">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                 <AlertTriangle className="h-4 w-4" />
@@ -320,7 +320,7 @@ const Fleet = () => {
         </div>
 
         {/* Analytics Dashboard with Tabs */}
-        <Card className="bg-card/60 backdrop-blur-sm border-border/50 mb-8">
+        <Card className="bg-card/30 backdrop-blur-lg border-border/30 mb-8">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <TrendingUp className="h-5 w-5 text-primary" />
@@ -435,7 +435,7 @@ const Fleet = () => {
 
         {/* Fleet Composition and Maintenance Schedule */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          <Card className="bg-card/60 backdrop-blur-sm border-border/50">
+          <Card className="bg-card/30 backdrop-blur-lg border-border/30">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <BarChart3 className="h-5 w-5 text-primary" />
@@ -461,7 +461,7 @@ const Fleet = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-card/60 backdrop-blur-sm border-border/50">
+          <Card className="bg-card/30 backdrop-blur-lg border-border/30">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Wrench className="h-5 w-5 text-primary" />
@@ -501,7 +501,7 @@ const Fleet = () => {
 
         {/* Status Overview Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card className="bg-card/60 backdrop-blur-sm border-green-500/30">
+          <Card className="bg-card/30 backdrop-blur-lg border-green-500/30">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <CheckCircle className="h-5 w-5 text-green-500" />
@@ -520,7 +520,7 @@ const Fleet = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-card/60 backdrop-blur-sm border-destructive/30">
+          <Card className="bg-card/30 backdrop-blur-lg border-destructive/30">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <Wrench className="h-5 w-5 text-destructive" />
@@ -539,7 +539,7 @@ const Fleet = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-card/60 backdrop-blur-sm border-blue-500/30">
+          <Card className="bg-card/30 backdrop-blur-lg border-blue-500/30">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <Clock className="h-5 w-5 text-blue-500" />
