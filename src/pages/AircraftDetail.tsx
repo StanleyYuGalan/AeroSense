@@ -484,7 +484,7 @@ const AircraftDetail = () => {
   if (!aircraft) {
   return (
     <div className="min-h-screen bg-background bg-cover bg-center bg-fixed" style={{ backgroundImage: 'url(/images/background.jpeg)' }}>
-      <div className="min-h-screen bg-background/90 backdrop-blur-sm">
+      <div className="min-h-screen bg-background/50">
         <Header />
         <main className="container mx-auto px-4 pt-24 pb-12">
           <Card className="p-12 text-center">
@@ -501,7 +501,7 @@ const AircraftDetail = () => {
 
   return (
     <div className="min-h-screen bg-background bg-cover bg-center bg-fixed" style={{ backgroundImage: 'url(/images/background.jpeg)' }}>
-      <div className="min-h-screen bg-background/90 backdrop-blur-sm">
+      <div className="min-h-screen bg-background/50">
         <Header />
       
       <main className="container mx-auto px-4 pt-24 pb-12">
