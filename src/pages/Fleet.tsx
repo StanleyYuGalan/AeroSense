@@ -190,8 +190,11 @@ const Fleet = () => {
           <p className="text-muted-foreground">Real-time monitoring and analytics for your entire aircraft fleet</p>
         </div>
 
-        {/* Key Metrics Dashboard */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 xl:grid-cols-[1fr,400px] gap-8">
+          {/* Left Column - Dashboard */}
+          <div className="space-y-8">
+            {/* Key Metrics Dashboard */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <Card className="bg-card/60 backdrop-blur-sm border-border/50">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
@@ -490,64 +493,71 @@ const Fleet = () => {
               </div>
             </CardContent>
           </Card>
-        </div>
+            </div>
+          </div>
 
-        <div className="mb-6">
-          <h3 className="text-2xl font-bold text-foreground mb-2">All Aircraft</h3>
-          <p className="text-muted-foreground">Click on any aircraft for detailed information</p>
-        </div>
+          {/* Right Column - Aircraft List */}
+          <div className="space-y-6">
+            <div>
+              <h3 className="text-2xl font-bold text-foreground mb-2">All Aircraft</h3>
+              <p className="text-muted-foreground">Click for details</p>
+            </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {fleetData.map((aircraft) => (
-            <Link key={aircraft.id} to={`/aircraft/${aircraft.id}`}>
-              <Card className="overflow-hidden bg-card/60 backdrop-blur-sm border-border/50 hover:border-primary/50 transition-all cursor-pointer hover:shadow-lg">
-                <div className="relative h-48 overflow-hidden">
-                  <img 
-                    src={aircraft.image} 
-                    alt={`${aircraft.model} - ${aircraft.id}`}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                
-                <div className="p-6">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-center gap-2">
-                      <Plane className="h-6 w-6 text-primary" />
-                      <h3 className="font-bold text-lg text-foreground">{aircraft.id}</h3>
-                    </div>
-                    {getStatusIcon(aircraft.status)}
-                  </div>
-
-                  <div className="space-y-3">
-                    <div>
-                      <p className="text-sm font-medium text-foreground">{aircraft.model}</p>
-                      <p className="text-xs text-muted-foreground">{aircraft.location}</p>
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                      {getStatusBadge(aircraft.status)}
-                      {aircraft.warnings > 0 && (
-                        <Badge variant="outline" className="text-warning border-warning">
-                          {aircraft.warnings} Warning{aircraft.warnings > 1 ? "s" : ""}
-                        </Badge>
-                      )}
-                    </div>
-
-                    <div className="pt-3 border-t border-border/50">
-                      <div className="flex justify-between text-xs mb-1">
-                        <span className="text-muted-foreground">Flight Hours</span>
-                        <span className="font-medium text-foreground">{aircraft.flightHours.toLocaleString()}</span>
+            <div className="space-y-4">
+              {fleetData.map((aircraft) => (
+                <Link key={aircraft.id} to={`/aircraft/${aircraft.id}`}>
+                  <Card className="overflow-hidden bg-card/60 backdrop-blur-sm border-border/50 hover:border-primary/50 transition-all cursor-pointer hover:shadow-lg">
+                    <div className="flex">
+                      <div className="relative w-32 h-32 flex-shrink-0 overflow-hidden">
+                        <img 
+                          src={aircraft.image} 
+                          alt={`${aircraft.model} - ${aircraft.id}`}
+                          className="w-full h-full object-cover"
+                        />
                       </div>
-                      <div className="flex justify-between text-xs">
-                        <span className="text-muted-foreground">Next Maintenance</span>
-                        <span className="font-medium text-foreground">{aircraft.nextMaintenance}</span>
+                      
+                      <div className="flex-1 p-4">
+                        <div className="flex items-start justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            <Plane className="h-5 w-5 text-primary" />
+                            <h3 className="font-bold text-foreground">{aircraft.id}</h3>
+                          </div>
+                          {getStatusIcon(aircraft.status)}
+                        </div>
+
+                        <div className="space-y-2">
+                          <div>
+                            <p className="text-sm font-medium text-foreground">{aircraft.model}</p>
+                            <p className="text-xs text-muted-foreground">{aircraft.location}</p>
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            {getStatusBadge(aircraft.status)}
+                            {aircraft.warnings > 0 && (
+                              <Badge variant="outline" className="text-warning border-warning">
+                                {aircraft.warnings} Warning{aircraft.warnings > 1 ? "s" : ""}
+                              </Badge>
+                            )}
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-2 text-xs pt-2 border-t border-border/50">
+                            <div>
+                              <span className="text-muted-foreground">Hours</span>
+                              <p className="font-medium text-foreground">{aircraft.flightHours.toLocaleString()}</p>
+                            </div>
+                            <div>
+                              <span className="text-muted-foreground">Next Maint.</span>
+                              <p className="font-medium text-foreground text-xs">{aircraft.nextMaintenance}</p>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </div>
-              </Card>
-            </Link>
-          ))}
+                  </Card>
+                </Link>
+              ))}
+            </div>
+          </div>
         </div>
       </main>
     </div>
