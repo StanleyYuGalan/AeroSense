@@ -180,6 +180,9 @@ const Fleet = () => {
     modelCounts[aircraft.model] = (modelCounts[aircraft.model] || 0) + 1;
   });
 
+  // Get all aircraft with warnings
+  const aircraftWithWarnings = fleetData.filter(a => a.warnings > 0);
+
   return (
     <div className="min-h-screen bg-background bg-cover bg-center bg-fixed" style={{ backgroundImage: 'url(/images/background.jpeg)' }}>
       <div className="min-h-screen bg-background/50">
@@ -190,6 +193,50 @@ const Fleet = () => {
           <h2 className="text-3xl font-bold text-foreground mb-2">Fleet Overview Dashboard</h2>
           <p className="text-muted-foreground">Real-time monitoring and analytics for your entire aircraft fleet</p>
         </div>
+
+        {/* Active Warnings Section */}
+        {aircraftWithWarnings.length > 0 && (
+          <div className="mb-8">
+            <div className="flex items-center gap-2 mb-4">
+              <AlertTriangle className="h-6 w-6 text-warning" />
+              <h3 className="text-2xl font-bold text-foreground">Active Warnings</h3>
+              <Badge variant="destructive" className="ml-2">
+                {totalWarnings} Total
+              </Badge>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+              {aircraftWithWarnings.map((aircraft) => (
+                <Link key={aircraft.id} to={`/aircraft/${aircraft.id}`}>
+                  <Card interactive className="bg-destructive/10 backdrop-blur-lg border-warning/50 hover:border-warning transition-all cursor-pointer hover:shadow-lg hover:shadow-warning/20">
+                    <CardContent className="p-4">
+                      <div className="flex items-start gap-3">
+                        <div className="p-2 bg-warning/20 rounded-lg">
+                          <AlertTriangle className="h-5 w-5 text-warning" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between mb-2">
+                            <h4 className="font-bold text-foreground">{aircraft.id}</h4>
+                            <Badge variant="outline" className="text-warning border-warning">
+                              {aircraft.warnings} Warning{aircraft.warnings > 1 ? "s" : ""}
+                            </Badge>
+                          </div>
+                          <p className="text-sm text-foreground font-medium">{aircraft.model}</p>
+                          <p className="text-xs text-muted-foreground mt-1">{aircraft.location}</p>
+                          <div className="mt-3 flex items-center gap-2">
+                            {getStatusBadge(aircraft.status)}
+                            <span className="text-xs text-muted-foreground">
+                              {aircraft.flightHours.toLocaleString()} hrs
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
 
         <Tabs defaultValue="aircraft" className="space-y-6">
           <TabsList className="grid w-full max-w-md grid-cols-2">
