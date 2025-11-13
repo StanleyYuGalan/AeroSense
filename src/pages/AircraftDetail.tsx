@@ -4,7 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Plane, MapPin, Clock, AlertTriangle, CheckCircle, Wrench, FileText, Calendar } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { ArrowLeft, Plane, MapPin, Clock, AlertTriangle, CheckCircle, Wrench, FileText, Calendar, XCircle } from "lucide-react";
 import a350Image from "@/assets/a350.jpg";
 import a380Image from "@/assets/a380.jpg";
 import boeing777_300Image from "@/assets/777-300er.jpeg";
@@ -54,6 +55,26 @@ const aircraftDatabase: Record<string, any> = {
     lastInspection: "2024-01-10",
     nextInspection: "2024-01-20",
     certifications: ["EASA", "FAA", "GCAA"],
+    warningDetails: [
+      {
+        id: "WARN-001",
+        severity: "high",
+        system: "Hydraulic System",
+        description: "Hydraulic fluid pressure fluctuation detected in primary system",
+        detectedDate: "2024-01-15 14:23 UTC",
+        action: "System monitoring and fluid level check required",
+        status: "Under Investigation"
+      },
+      {
+        id: "WARN-002",
+        severity: "medium",
+        system: "Navigation",
+        description: "GPS signal intermittent on backup navigation unit",
+        detectedDate: "2024-01-16 09:45 UTC",
+        action: "Backup unit replacement scheduled",
+        status: "Maintenance Scheduled"
+      }
+    ]
   },
   "A6-EPF": {
     id: "A6-EPF",
@@ -98,6 +119,17 @@ const aircraftDatabase: Record<string, any> = {
     lastInspection: "2023-12-15",
     nextInspection: "2024-02-01",
     certifications: ["FAA", "EASA", "GCAA"],
+    warningDetails: [
+      {
+        id: "WARN-003",
+        severity: "low",
+        system: "Cabin Systems",
+        description: "Entertainment system intermittent failure in row 15-18",
+        detectedDate: "2024-01-14 18:30 UTC",
+        action: "Component replacement during next scheduled maintenance",
+        status: "Scheduled for Maintenance"
+      }
+    ]
   },
   "A6-EWE": {
     id: "A6-EWE",
@@ -186,6 +218,17 @@ const aircraftDatabase: Record<string, any> = {
     lastInspection: "2023-12-12",
     nextInspection: "2024-01-17",
     certifications: ["FAA", "EASA", "GCAA"],
+    warningDetails: [
+      {
+        id: "WARN-004",
+        severity: "medium",
+        system: "Landing Gear",
+        description: "Tire wear indicator shows approaching replacement threshold",
+        detectedDate: "2024-01-13 11:00 UTC",
+        action: "Tire replacement during scheduled maintenance",
+        status: "Action Planned"
+      }
+    ]
   },
 };
 
@@ -232,6 +275,32 @@ const getHealthColor = (health: number) => {
   if (health >= 85) return "text-blue-500";
   if (health >= 75) return "text-yellow-500";
   return "text-destructive";
+};
+
+const getSeverityColor = (severity: string) => {
+  switch (severity) {
+    case "high":
+      return "destructive";
+    case "medium":
+      return "default";
+    case "low":
+      return "secondary";
+    default:
+      return "outline";
+  }
+};
+
+const getSeverityIcon = (severity: string) => {
+  switch (severity) {
+    case "high":
+      return <XCircle className="h-5 w-5" />;
+    case "medium":
+      return <AlertTriangle className="h-5 w-5" />;
+    case "low":
+      return <AlertTriangle className="h-5 w-5" />;
+    default:
+      return <AlertTriangle className="h-5 w-5" />;
+  }
 };
 
 const AircraftDetail = () => {
@@ -290,6 +359,54 @@ const AircraftDetail = () => {
             </div>
           </div>
         </div>
+
+        {/* Warning Messages - Front and Center */}
+        {aircraft.warnings > 0 && aircraft.warningDetails && (
+          <Alert variant="destructive" className="mb-8 border-2 border-warning bg-warning/10 backdrop-blur-sm">
+            <AlertTriangle className="h-6 w-6" />
+            <AlertTitle className="text-xl font-bold mb-4">
+              {aircraft.warnings} Active Warning{aircraft.warnings > 1 ? "s" : ""} - Immediate Attention Required
+            </AlertTitle>
+            <AlertDescription>
+              <div className="space-y-4">
+                {aircraft.warningDetails.map((warning: any) => (
+                  <Card key={warning.id} className="border-warning/50 bg-background/80">
+                    <CardContent className="p-4">
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex items-start gap-3">
+                          {getSeverityIcon(warning.severity)}
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <h4 className="font-bold text-foreground text-lg">{warning.system}</h4>
+                              <Badge variant={getSeverityColor(warning.severity) as any} className="uppercase text-xs">
+                                {warning.severity} Priority
+                              </Badge>
+                            </div>
+                            <p className="text-sm text-muted-foreground mb-2">ID: {warning.id}</p>
+                          </div>
+                        </div>
+                        <Badge variant="outline" className="ml-2">{warning.status}</Badge>
+                      </div>
+                      <div className="space-y-2 pl-8">
+                        <div>
+                          <p className="text-sm font-medium text-foreground mb-1">Description:</p>
+                          <p className="text-sm text-muted-foreground">{warning.description}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-foreground mb-1">Required Action:</p>
+                          <p className="text-sm text-muted-foreground">{warning.action}</p>
+                        </div>
+                        <div className="pt-2 border-t border-border/50">
+                          <p className="text-xs text-muted-foreground">Detected: {warning.detectedDate}</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </AlertDescription>
+          </Alert>
+        )}
 
         {/* Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
