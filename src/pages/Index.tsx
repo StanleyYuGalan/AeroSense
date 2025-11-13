@@ -9,21 +9,9 @@ const Index = () => {
   const [selectedEntryId, setSelectedEntryId] = useState<string>("0");
 
   return (
-    <div className="min-h-screen bg-tech-pattern relative overflow-hidden">
-      {/* Tech Background Pattern */}
-      <div className="absolute inset-0 bg-gradient-radial from-primary/5 via-transparent to-transparent opacity-50" />
-      <div
-        className="absolute inset-0 opacity-10"
-        style={{
-          backgroundImage: `
-            linear-gradient(to right, hsl(var(--primary)) 1px, transparent 1px),
-            linear-gradient(to bottom, hsl(var(--primary)) 1px, transparent 1px)
-          `,
-          backgroundSize: "50px 50px",
-        }}
-      />
-
-      <Header />
+    <div className="min-h-screen bg-background bg-cover bg-center bg-fixed" style={{ backgroundImage: 'url(/images/background.jpeg)' }}>
+      <div className="min-h-screen bg-background/90 backdrop-blur-sm">
+        <Header />
 
       <main className="container mx-auto px-4 py-8 pt-24 relative z-10">
         <div className="grid lg:grid-cols-2 gap-6">
@@ -39,6 +27,7 @@ const Index = () => {
           </div>
         </div>
       </main>
+      </div>
     </div>
   );
 };

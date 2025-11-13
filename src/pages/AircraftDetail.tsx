@@ -482,8 +482,9 @@ const AircraftDetail = () => {
   const aircraft = id ? aircraftDatabase[id] : null;
 
   if (!aircraft) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
+  return (
+    <div className="min-h-screen bg-background bg-cover bg-center bg-fixed" style={{ backgroundImage: 'url(/images/background.jpeg)' }}>
+      <div className="min-h-screen bg-background/90 backdrop-blur-sm">
         <Header />
         <main className="container mx-auto px-4 pt-24 pb-12">
           <Card className="p-12 text-center">
@@ -494,12 +495,14 @@ const AircraftDetail = () => {
           </Card>
         </main>
       </div>
+    </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
-      <Header />
+    <div className="min-h-screen bg-background bg-cover bg-center bg-fixed" style={{ backgroundImage: 'url(/images/background.jpeg)' }}>
+      <div className="min-h-screen bg-background/90 backdrop-blur-sm">
+        <Header />
       
       <main className="container mx-auto px-4 pt-24 pb-12">
         <Link to="/fleet" className="inline-flex items-center gap-2 text-primary hover:underline mb-6">
@@ -972,6 +975,7 @@ const AircraftDetail = () => {
           </TabsContent>
         </Tabs>
       </main>
+      </div>
     </div>
   );
 };

@@ -181,8 +181,9 @@ const Fleet = () => {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
-      <Header />
+    <div className="min-h-screen bg-background bg-cover bg-center bg-fixed" style={{ backgroundImage: 'url(/images/background.jpeg)' }}>
+      <div className="min-h-screen bg-background/90 backdrop-blur-sm">
+        <Header />
       
       <main className="container mx-auto px-4 pt-24 pb-12">
         <div className="mb-8">
@@ -560,6 +561,7 @@ const Fleet = () => {
           </div>
         </div>
       </main>
+      </div>
     </div>
   );
 };
