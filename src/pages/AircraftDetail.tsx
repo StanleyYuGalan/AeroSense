@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { ArrowLeft, Plane, MapPin, Clock, AlertTriangle, CheckCircle, Wrench, FileText, Calendar, XCircle, ChevronDown, User, ClipboardCheck, Settings } from "lucide-react";
+import { ArrowLeft, Plane, MapPin, Clock, AlertTriangle, CheckCircle, Wrench, FileText, Calendar, XCircle, ChevronDown, User, ClipboardCheck, Settings, Shield, Lock } from "lucide-react";
 import a350Image from "@/assets/a350.jpg";
 import a380Image from "@/assets/a380.jpg";
 import boeing777_300Image from "@/assets/777-300er.jpeg";
@@ -548,7 +548,10 @@ const AircraftDetail = () => {
       type: "Certification",
       issuedBy: "GCAA - General Civil Aviation Authority",
       certificateNumber: "AWC-2024-A350-342",
-      content: "This is to certify that the aircraft Airbus A350-900, registration A6-EDA, serial number MSN-342, has been inspected and found to be airworthy in accordance with the applicable airworthiness requirements."
+      content: "This is to certify that the aircraft Airbus A350-900, registration A6-EDA, serial number MSN-342, has been inspected and found to be airworthy in accordance with the applicable airworthiness requirements.",
+      blockchainHash: "0x7f9a8b3c4d5e6f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5",
+      blockNumber: "15,847,923",
+      timestamp: "2024-01-15 14:32:18 UTC"
     },
     { 
       name: "Certificate of Registration", 
@@ -556,7 +559,10 @@ const AircraftDetail = () => {
       type: "Legal",
       issuedBy: "UAE Civil Aviation Authority",
       certificateNumber: "REG-UAE-A6-EDA",
-      content: "This certificate confirms that the aircraft Airbus A350-900, manufacturer serial number MSN-342, is duly registered in the name of Emirates Airline in the UAE Aircraft Register under registration mark A6-EDA."
+      content: "This certificate confirms that the aircraft Airbus A350-900, manufacturer serial number MSN-342, is duly registered in the name of Emirates Airline in the UAE Aircraft Register under registration mark A6-EDA.",
+      blockchainHash: "0x3c8d9e2f1a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c",
+      blockNumber: "12,456,789",
+      timestamp: "2019-04-20 09:15:42 UTC"
     },
     { 
       name: "Noise Certificate", 
@@ -564,7 +570,10 @@ const AircraftDetail = () => {
       type: "Compliance",
       issuedBy: "EASA - European Aviation Safety Agency",
       certificateNumber: "NC-2024-A350-342",
-      content: "This certificate verifies that the aircraft meets the noise standards specified in ICAO Annex 16, Volume I, Chapter 14. Maximum noise levels: Takeoff 89.3 EPNdB, Approach 97.1 EPNdB, Lateral 94.8 EPNdB."
+      content: "This certificate verifies that the aircraft meets the noise standards specified in ICAO Annex 16, Volume I, Chapter 14. Maximum noise levels: Takeoff 89.3 EPNdB, Approach 97.1 EPNdB, Lateral 94.8 EPNdB.",
+      blockchainHash: "0x1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b",
+      blockNumber: "15,234,567",
+      timestamp: "2024-01-10 11:23:45 UTC"
     },
     { 
       name: "Radio License", 
@@ -572,7 +581,10 @@ const AircraftDetail = () => {
       type: "Operational",
       issuedBy: "UAE Telecommunications Regulatory Authority",
       certificateNumber: "RL-2024-A6-EDA",
-      content: "Authorization is granted for the operation of radio equipment on aircraft A6-EDA. Authorized frequencies: VHF 118.0-136.975 MHz, HF 2.85-22.0 MHz, Satellite Communication authorized."
+      content: "Authorization is granted for the operation of radio equipment on aircraft A6-EDA. Authorized frequencies: VHF 118.0-136.975 MHz, HF 2.85-22.0 MHz, Satellite Communication authorized.",
+      blockchainHash: "0x9e8f7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e0f9a8b7c6d5e4f3a2b1c0d9e",
+      blockNumber: "15,678,901",
+      timestamp: "2024-01-08 16:45:22 UTC"
     },
     { 
       name: "Insurance Certificate", 
@@ -580,7 +592,10 @@ const AircraftDetail = () => {
       type: "Insurance",
       issuedBy: "Global Aviation Insurance Ltd.",
       certificateNumber: "INS-2024-EDA-001",
-      content: "This certificate provides evidence of insurance coverage for aircraft A6-EDA. Hull Value: $300,000,000 USD. Liability Coverage: $2,000,000,000 USD per occurrence. Coverage includes: Hull All Risks, Third Party Liability, War & Allied Perils."
+      content: "This certificate provides evidence of insurance coverage for aircraft A6-EDA. Hull Value: $300,000,000 USD. Liability Coverage: $2,000,000,000 USD per occurrence. Coverage includes: Hull All Risks, Third Party Liability, War & Allied Perils.",
+      blockchainHash: "0x4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c",
+      blockNumber: "15,901,234",
+      timestamp: "2024-01-01 00:00:00 UTC"
     },
     { 
       name: "Maintenance Program Manual", 
@@ -588,7 +603,10 @@ const AircraftDetail = () => {
       type: "Technical",
       issuedBy: "Emirates Engineering",
       certificateNumber: "MPM-A350-Rev5.2",
-      content: "This manual outlines the approved maintenance program for A6-EDA. Includes: A-Check intervals (600 FH), B-Check intervals (6000 FH), C-Check intervals (24 months), Major structural inspections, Component life limits, and special inspections."
+      content: "This manual outlines the approved maintenance program for A6-EDA. Includes: A-Check intervals (600 FH), B-Check intervals (6000 FH), C-Check intervals (24 months), Major structural inspections, Component life limits, and special inspections.",
+      blockchainHash: "0x2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d",
+      blockNumber: "15,789,012",
+      timestamp: "2024-01-01 10:30:15 UTC"
     },
     { 
       name: "Flight Operations Manual", 
@@ -596,7 +614,10 @@ const AircraftDetail = () => {
       type: "Operational",
       issuedBy: "Emirates Flight Operations",
       certificateNumber: "FOM-A350-Rev12.1",
-      content: "Standard Operating Procedures for A350-900 operations. Covers: Normal procedures, Non-normal procedures, Performance data, Weight & Balance, Route-specific procedures, MEL/CDL procedures, and Emergency procedures."
+      content: "Standard Operating Procedures for A350-900 operations. Covers: Normal procedures, Non-normal procedures, Performance data, Weight & Balance, Route-specific procedures, MEL/CDL procedures, and Emergency procedures.",
+      blockchainHash: "0x5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e",
+      blockNumber: "15,823,456",
+      timestamp: "2024-01-01 12:00:00 UTC"
     },
   ];
 
@@ -1161,8 +1182,19 @@ const AircraftDetail = () => {
           <TabsContent value="documents">
             <Card className="bg-card/40 backdrop-blur-md">
               <CardHeader>
-                <CardTitle>Aircraft Documentation</CardTitle>
-                <CardDescription>Certifications, manuals, and compliance documents (Click to view)</CardDescription>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      <Shield className="h-5 w-5 text-green-500" />
+                      Aircraft Documentation
+                    </CardTitle>
+                    <CardDescription>Blockchain-secured certifications, manuals, and compliance documents</CardDescription>
+                  </div>
+                  <Badge variant="outline" className="gap-2 text-green-500 border-green-500">
+                    <Lock className="h-3 w-3" />
+                    Blockchain Verified
+                  </Badge>
+                </div>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
@@ -1170,18 +1202,39 @@ const AircraftDetail = () => {
                     <div 
                       key={index} 
                       onClick={() => setSelectedDocument(doc)}
-                      className="flex items-center justify-between p-4 border border-border/50 rounded-lg hover:border-primary/50 transition-colors cursor-pointer hover:bg-muted/30"
+                      className="flex items-center justify-between p-4 border border-border/50 rounded-lg hover:border-primary/50 transition-colors cursor-pointer hover:bg-muted/30 relative"
                     >
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-3 flex-1">
                         <FileText className="h-5 w-5 text-primary" />
-                        <div>
-                          <p className="font-medium text-foreground">{doc.name}</p>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <p className="font-medium text-foreground">{doc.name}</p>
+                            <Badge variant="outline" className="text-xs gap-1 text-green-500 border-green-500/50">
+                              <Shield className="h-2.5 w-2.5" />
+                              Secured
+                            </Badge>
+                          </div>
                           <p className="text-sm text-muted-foreground">{doc.date}</p>
                         </div>
                       </div>
                       <Badge variant="secondary">{doc.type}</Badge>
                     </div>
                   ))}
+                </div>
+                
+                {/* Blockchain Security Notice */}
+                <div className="mt-6 p-4 bg-green-500/10 border border-green-500/30 rounded-lg">
+                  <div className="flex items-start gap-3">
+                    <Shield className="h-5 w-5 text-green-500 mt-0.5" />
+                    <div>
+                      <p className="text-sm font-semibold text-foreground mb-1">Blockchain Security Enabled</p>
+                      <p className="text-xs text-muted-foreground">
+                        All documents are cryptographically secured on the blockchain, ensuring immutability, 
+                        tamper-proof verification, and complete audit trail. Each document has a unique hash 
+                        stored on-chain for authenticity verification.
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -1194,14 +1247,52 @@ const AircraftDetail = () => {
                 <DialogTitle className="text-2xl flex items-center gap-3">
                   <FileText className="h-6 w-6 text-primary" />
                   {selectedDocument?.name}
+                  <Badge variant="outline" className="gap-1.5 text-green-500 border-green-500 ml-auto">
+                    <Shield className="h-3 w-3" />
+                    Blockchain Verified
+                  </Badge>
                 </DialogTitle>
                 <DialogDescription>
-                  Official aircraft documentation
+                  Official aircraft documentation • Secured on blockchain
                 </DialogDescription>
               </DialogHeader>
 
               {selectedDocument && (
                 <div className="space-y-6 mt-4">
+                  {/* Blockchain Verification Badge */}
+                  <div className="border-2 border-green-500/30 bg-green-500/10 p-4 rounded-lg">
+                    <div className="flex items-start gap-3 mb-4">
+                      <div className="p-2 bg-green-500/20 rounded-full">
+                        <Lock className="h-5 w-5 text-green-500" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-bold text-foreground flex items-center gap-2 mb-1">
+                          Blockchain Security Verification
+                          <CheckCircle className="h-4 w-4 text-green-500" />
+                        </h3>
+                        <p className="text-xs text-muted-foreground mb-3">
+                          This document has been cryptographically secured and verified on the blockchain. 
+                          The document hash ensures complete immutability and authenticity.
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                      <div className="p-2 bg-background/50 rounded border border-border/30">
+                        <p className="text-muted-foreground mb-1">Blockchain Hash</p>
+                        <p className="font-mono text-foreground text-[10px] break-all">{selectedDocument.blockchainHash}</p>
+                      </div>
+                      <div className="p-2 bg-background/50 rounded border border-border/30">
+                        <p className="text-muted-foreground mb-1">Block Number</p>
+                        <p className="font-semibold text-foreground">{selectedDocument.blockNumber}</p>
+                      </div>
+                      <div className="p-2 bg-background/50 rounded border border-border/30">
+                        <p className="text-muted-foreground mb-1">Timestamp</p>
+                        <p className="font-semibold text-foreground">{selectedDocument.timestamp}</p>
+                      </div>
+                    </div>
+                  </div>
+
                   {/* Document Header */}
                   <div className="border-2 border-primary/30 bg-gradient-to-r from-primary/5 to-primary/10 p-6 rounded-lg">
                     <div className="grid grid-cols-2 gap-4">
@@ -1284,25 +1375,38 @@ const AircraftDetail = () => {
                     </div>
 
                     {/* Document Footer */}
-                    <div className="mt-8 pt-4 border-t border-gray-300 text-center">
-                      <p className="text-xs text-gray-500">
-                        This is an official document. Any alteration or unauthorized reproduction is prohibited.
+                    <div className="mt-8 pt-4 border-t border-gray-300">
+                      <div className="flex items-center justify-center gap-2 mb-2">
+                        <Shield className="h-4 w-4 text-green-600" />
+                        <p className="text-xs font-semibold text-green-600">BLOCKCHAIN VERIFIED DOCUMENT</p>
+                      </div>
+                      <p className="text-xs text-gray-500 text-center">
+                        This is an official document secured on the blockchain. Any alteration or unauthorized reproduction is prohibited.
                       </p>
-                      <p className="text-xs text-gray-400 mt-1">
-                        Document ID: {selectedDocument.certificateNumber} | Generated: {new Date().toLocaleDateString()}
+                      <p className="text-xs text-gray-400 mt-2 text-center">
+                        Document ID: {selectedDocument.certificateNumber} | Blockchain Hash: {selectedDocument.blockchainHash.slice(0, 20)}...
+                      </p>
+                      <p className="text-xs text-gray-400 text-center">
+                        Block: {selectedDocument.blockNumber} | Verified: {selectedDocument.timestamp}
                       </p>
                     </div>
                   </div>
 
                   {/* Document Actions */}
-                  <div className="flex gap-3 justify-end">
-                    <Badge variant="outline" className="cursor-pointer hover:bg-muted">
-                      <FileText className="h-3 w-3 mr-1" />
-                      Download PDF
+                  <div className="flex gap-3 justify-between items-center">
+                    <Badge variant="outline" className="gap-1.5 text-green-500 border-green-500">
+                      <CheckCircle className="h-3 w-3" />
+                      Verified on Blockchain
                     </Badge>
-                    <Badge variant="outline" className="cursor-pointer hover:bg-muted">
-                      Print Document
-                    </Badge>
+                    <div className="flex gap-3">
+                      <Badge variant="outline" className="cursor-pointer hover:bg-muted">
+                        <FileText className="h-3 w-3 mr-1" />
+                        Download PDF
+                      </Badge>
+                      <Badge variant="outline" className="cursor-pointer hover:bg-muted">
+                        Print Document
+                      </Badge>
+                    </div>
                   </div>
                 </div>
               )}
