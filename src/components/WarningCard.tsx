@@ -1,8 +1,36 @@
 import { Card } from "@/components/ui/card";
-import { AlertTriangle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { AlertTriangle, FileText, Bell, Wrench } from "lucide-react";
 import { MonitoringCharts } from "./MonitoringCharts";
+import { useToast } from "@/hooks/use-toast";
 
 export const WarningCard = () => {
+  const { toast } = useToast();
+
+  const handleCreateWorkOrder = () => {
+    toast({
+      title: "Creating Work Order",
+      description: "AeroSense AI is generating a comprehensive work order for Engine #2 inspection...",
+    });
+    // Agentic action would be triggered here
+  };
+
+  const handleNotifyTechnician = () => {
+    toast({
+      title: "Notifying Technician",
+      description: "AeroSense AI is alerting the assigned technician and providing diagnostic details...",
+    });
+    // Agentic action would be triggered here
+  };
+
+  const handleScheduleInspection = () => {
+    toast({
+      title: "Scheduling Inspection",
+      description: "AeroSense AI is coordinating with maintenance schedule and booking resources...",
+    });
+    // Agentic action would be triggered here
+  };
+
   return (
     <Card className="p-6 bg-card/60 backdrop-blur-sm border-warning/30 shadow-lg">
       <div className="flex items-center gap-3 mb-6">
@@ -68,6 +96,41 @@ export const WarningCard = () => {
               If findings are confirmed, coordinate with OEM for possible shop visit / early module replacement.
             </li>
           </ul>
+        </div>
+
+        <div className="bg-primary/10 p-4 rounded-lg border border-primary/30">
+          <h3 className="text-lg font-bold text-foreground mb-3 flex items-center gap-2">
+            <Wrench className="h-5 w-5 text-primary" />
+            Agentic Actions
+          </h3>
+          <p className="text-sm text-muted-foreground mb-4">
+            Request AeroSense AI to autonomously handle maintenance tasks:
+          </p>
+          <div className="flex flex-wrap gap-3">
+            <Button 
+              onClick={handleCreateWorkOrder}
+              className="flex items-center gap-2"
+            >
+              <FileText className="h-4 w-4" />
+              Create Work Order
+            </Button>
+            <Button 
+              onClick={handleNotifyTechnician}
+              variant="secondary"
+              className="flex items-center gap-2"
+            >
+              <Bell className="h-4 w-4" />
+              Notify Technician
+            </Button>
+            <Button 
+              onClick={handleScheduleInspection}
+              variant="outline"
+              className="flex items-center gap-2"
+            >
+              <AlertTriangle className="h-4 w-4" />
+              Schedule Inspection
+            </Button>
+          </div>
         </div>
       </div>
     </Card>
