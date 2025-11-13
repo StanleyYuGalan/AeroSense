@@ -461,49 +461,18 @@ const AircraftDetail = () => {
 
         {/* Tabbed Content */}
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="systems">Systems</TabsTrigger>
             <TabsTrigger value="flights">Flight History</TabsTrigger>
             <TabsTrigger value="maintenance">Maintenance</TabsTrigger>
             <TabsTrigger value="documents">Documents</TabsTrigger>
+            <TabsTrigger value="specs">Specifications</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card className="bg-card/60 backdrop-blur-sm">
-                <CardHeader>
-                  <CardTitle>Aircraft Specifications</CardTitle>
-                  <CardDescription>Technical details and capabilities</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Serial Number</span>
-                    <span className="font-medium text-foreground">{aircraft.serialNumber}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Engine Type</span>
-                    <span className="font-medium text-foreground">{aircraft.engines}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Maximum Range</span>
-                    <span className="font-medium text-foreground">{aircraft.maxRange}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Cruise Speed</span>
-                    <span className="font-medium text-foreground">{aircraft.cruiseSpeed}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Service Ceiling</span>
-                    <span className="font-medium text-foreground">{aircraft.maxAltitude}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Passenger Capacity</span>
-                    <span className="font-medium text-foreground">{aircraft.capacity}</span>
-                  </div>
-                </CardContent>
-              </Card>
-
+              {/* Service History */}
               <Card className="bg-card/60 backdrop-blur-sm">
                 <CardHeader>
                   <CardTitle>Service History</CardTitle>
@@ -517,6 +486,10 @@ const AircraftDetail = () => {
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Delivery Date</span>
                     <span className="font-medium text-foreground">{aircraft.deliveryDate}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Serial Number</span>
+                    <span className="font-medium text-foreground">{aircraft.serialNumber}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Last Inspection</span>
@@ -534,6 +507,89 @@ const AircraftDetail = () => {
                       ))}
                     </div>
                   </div>
+                </CardContent>
+              </Card>
+
+              {/* Recent Maintenance Log */}
+              <Card className="bg-card/60 backdrop-blur-sm">
+                <CardHeader>
+                  <CardTitle>Recent Maintenance Log</CardTitle>
+                  <CardDescription>Latest maintenance activities</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {maintenanceHistory.slice(0, 3).map((entry, index) => (
+                      <div key={index} className="p-3 border border-border/50 rounded-lg">
+                        <div className="flex items-start justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            <Wrench className="h-4 w-4 text-primary" />
+                            <span className="font-semibold text-foreground text-sm">{entry.type}</span>
+                          </div>
+                          <span className="text-xs text-muted-foreground">{entry.date}</span>
+                        </div>
+                        <p className="text-xs text-muted-foreground mb-1">{entry.description}</p>
+                        <div className="flex gap-4 text-xs text-muted-foreground">
+                          <span>Tech: {entry.technician}</span>
+                          <span>{entry.duration}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Critical Issues */}
+              <Card className="bg-card/60 backdrop-blur-sm lg:col-span-2">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <AlertTriangle className="h-5 w-5 text-warning" />
+                    Critical Issues & Active Warnings
+                  </CardTitle>
+                  <CardDescription>Real-time alerts and system anomalies</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {aircraft.warnings > 0 && aircraft.warningDetails ? (
+                    <div className="space-y-4">
+                      {aircraft.warningDetails.map((warning: any) => (
+                        <div key={warning.id} className="p-4 border-2 border-warning/30 rounded-lg bg-warning/5">
+                          <div className="flex items-start justify-between mb-3">
+                            <div className="flex items-start gap-3">
+                              {getSeverityIcon(warning.severity)}
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <h4 className="font-bold text-foreground">{warning.system}</h4>
+                                  <Badge variant={getSeverityColor(warning.severity) as any} className="uppercase text-xs">
+                                    {warning.severity}
+                                  </Badge>
+                                </div>
+                                <p className="text-xs text-muted-foreground">Warning ID: {warning.id}</p>
+                              </div>
+                            </div>
+                            <Badge variant="outline">{warning.status}</Badge>
+                          </div>
+                          <div className="space-y-2 pl-8">
+                            <div>
+                              <p className="text-xs font-semibold text-foreground mb-1">Issue Description:</p>
+                              <p className="text-sm text-muted-foreground">{warning.description}</p>
+                            </div>
+                            <div>
+                              <p className="text-xs font-semibold text-foreground mb-1">Required Action:</p>
+                              <p className="text-sm text-warning">{warning.action}</p>
+                            </div>
+                            <div className="pt-2 border-t border-border/30">
+                              <p className="text-xs text-muted-foreground">Detected: {warning.detectedDate}</p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8">
+                      <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-3" />
+                      <p className="text-lg font-semibold text-foreground mb-1">All Systems Nominal</p>
+                      <p className="text-sm text-muted-foreground">No active warnings or critical issues detected</p>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </div>
@@ -657,6 +713,49 @@ const AircraftDetail = () => {
                       <Badge variant="secondary">{doc.type}</Badge>
                     </div>
                   ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="specs">
+            <Card className="bg-card/60 backdrop-blur-sm">
+              <CardHeader>
+                <CardTitle>Aircraft Specifications</CardTitle>
+                <CardDescription>Technical details and capabilities</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-foreground text-sm mb-3">General Information</h4>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Serial Number</span>
+                      <span className="font-medium text-foreground">{aircraft.serialNumber}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Engine Type</span>
+                      <span className="font-medium text-foreground">{aircraft.engines}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Passenger Capacity</span>
+                      <span className="font-medium text-foreground">{aircraft.capacity}</span>
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-foreground text-sm mb-3">Performance</h4>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Maximum Range</span>
+                      <span className="font-medium text-foreground">{aircraft.maxRange}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Cruise Speed</span>
+                      <span className="font-medium text-foreground">{aircraft.cruiseSpeed}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Service Ceiling</span>
+                      <span className="font-medium text-foreground">{aircraft.maxAltitude}</span>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
