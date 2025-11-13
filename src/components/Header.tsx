@@ -10,15 +10,15 @@ export const Header = () => {
           <Button variant="ghost" size="icon" className="lg:hidden">
             <Menu className="h-6 w-6" />
           </Button>
-          <Link to="/fleet" className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-2">
             <Plane className="h-8 w-8 text-primary" />
             <h1 className="text-2xl font-bold text-foreground">AeroSense</h1>
           </Link>
         </div>
-        <Link to="/fleet">
+        <Link to="/">
           <Button variant="outline" className="gap-2">
             <Grid3x3 className="h-4 w-4" />
-            View Fleet
+            Fleet Overview
           </Button>
         </Link>
       </div>
