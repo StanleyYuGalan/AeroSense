@@ -1,9 +1,13 @@
+import { useState } from "react";
 import { Header } from "@/components/Header";
 import { AircraftInfoCard } from "@/components/AircraftInfoCard";
 import { MaintenanceLog } from "@/components/MaintenanceLog";
 import { WarningCard } from "@/components/WarningCard";
+import { MaintenanceDetailPanel } from "@/components/MaintenanceDetailPanel";
 
 const Index = () => {
+  const [selectedEntryId, setSelectedEntryId] = useState<string>("0");
+
   return (
     <div className="min-h-screen bg-tech-pattern relative overflow-hidden">
       {/* Tech Background Pattern */}
@@ -25,10 +29,13 @@ const Index = () => {
         <div className="grid lg:grid-cols-2 gap-6">
           <div className="space-y-6">
             <AircraftInfoCard />
-            <MaintenanceLog />
+            <MaintenanceLog 
+              selectedId={selectedEntryId}
+              onSelectEntry={setSelectedEntryId}
+            />
           </div>
           <div>
-            <WarningCard />
+            <MaintenanceDetailPanel entryId={selectedEntryId} />
           </div>
         </div>
       </main>

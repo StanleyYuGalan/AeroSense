@@ -1,10 +1,6 @@
-import { useParams, Link } from "react-router-dom";
-import { Header } from "@/components/Header";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft, AlertTriangle, CheckCircle2, Calendar, User, Wrench, FileText, Clock } from "lucide-react";
-import { logEntries } from "@/components/MaintenanceLog";
+import { AlertTriangle, CheckCircle2, Calendar, User, Wrench, FileText, Clock } from "lucide-react";
 
 interface MaintenanceDetail {
   id: string;
@@ -24,7 +20,7 @@ interface MaintenanceDetail {
   attachments: string[];
 }
 
-const maintenanceDetails: Record<string, MaintenanceDetail> = {
+export const maintenanceDetails: Record<string, MaintenanceDetail> = {
   "0": {
     id: "0",
     title: "Engine Anomaly Detected",
@@ -226,209 +222,134 @@ const maintenanceDetails: Record<string, MaintenanceDetail> = {
   }
 };
 
-const MaintenanceDetail = () => {
-  const { id } = useParams<{ id: string }>();
-  const entry = logEntries.find((e) => e.id === id);
-  const details = id ? maintenanceDetails[id] : null;
+interface MaintenanceDetailPanelProps {
+  entryId: string;
+}
 
-  if (!entry || !details) {
+export const MaintenanceDetailPanel = ({ entryId }: MaintenanceDetailPanelProps) => {
+  const details = maintenanceDetails[entryId];
+
+  if (!details) {
     return (
-      <div className="min-h-screen bg-tech-pattern">
-        <Header />
-        <main className="container mx-auto px-4 py-8 pt-24">
-          <Card className="p-8 bg-card/60 backdrop-blur-sm border-border shadow-lg text-center">
-            <h2 className="text-2xl font-bold text-foreground mb-4">Maintenance Record Not Found</h2>
-            <Link to="/">
-              <Button>
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Dashboard
-              </Button>
-            </Link>
-          </Card>
-        </main>
-      </div>
+      <Card className="p-6 bg-card/60 backdrop-blur-sm border-border shadow-lg">
+        <p className="text-center text-muted-foreground">Select an entry to view details</p>
+      </Card>
     );
   }
 
   return (
-    <div className="min-h-screen bg-tech-pattern relative overflow-hidden">
-      {/* Tech Background Pattern */}
-      <div className="absolute inset-0 bg-gradient-radial from-primary/5 via-transparent to-transparent opacity-50" />
-      <div
-        className="absolute inset-0 opacity-10"
-        style={{
-          backgroundImage: `
-            linear-gradient(to right, hsl(var(--primary)) 1px, transparent 1px),
-            linear-gradient(to bottom, hsl(var(--primary)) 1px, transparent 1px)
-          `,
-          backgroundSize: "50px 50px",
-        }}
-      />
-
-      <Header />
-
-      <main className="container mx-auto px-4 py-8 pt-24 relative z-10">
-        <div className="mb-6">
-          <Link to="/">
-            <Button variant="outline" className="gap-2">
-              <ArrowLeft className="h-4 w-4" />
-              Back to Dashboard
-            </Button>
-          </Link>
+    <div className="space-y-6">
+      {/* Header */}
+      <Card className="p-6 bg-card/60 backdrop-blur-sm border-warning/30 shadow-lg">
+        <div className="flex items-start gap-4 mb-6">
+          {details.status === "open" ? (
+            <div className="bg-warning/20 rounded-full p-3 animate-pulse-glow">
+              <AlertTriangle className="h-8 w-8 text-warning" />
+            </div>
+          ) : (
+            <div className="bg-primary/20 rounded-full p-3">
+              <CheckCircle2 className="h-8 w-8 text-primary" />
+            </div>
+          )}
+          <div className="flex-1">
+            <h2 className="text-2xl font-bold text-foreground mb-2">{details.title}</h2>
+            <div className="flex items-center gap-4 flex-wrap">
+              <Badge variant={details.status === "open" ? "destructive" : "secondary"}>
+                {details.status === "open" ? "Open" : "Resolved"}
+              </Badge>
+              <Badge variant="outline">Priority: {details.priority}</Badge>
+            </div>
+          </div>
         </div>
 
-        <div className="space-y-6">
-          {/* Header Card */}
-          <Card className="p-6 bg-card/60 backdrop-blur-sm border-border shadow-lg">
-            <div className="flex items-start justify-between mb-6">
-              <div className="flex items-start gap-4">
-                {details.status === "open" ? (
-                  <div className="bg-warning/20 rounded-full p-3 animate-pulse-glow">
-                    <AlertTriangle className="h-8 w-8 text-warning" />
-                  </div>
-                ) : (
-                  <div className="bg-primary/20 rounded-full p-3">
-                    <CheckCircle2 className="h-8 w-8 text-primary" />
-                  </div>
-                )}
-                <div>
-                  <h1 className="text-3xl font-bold text-foreground mb-2">{details.title}</h1>
-                  <div className="flex items-center gap-4 flex-wrap">
-                    <Badge variant={details.status === "open" ? "destructive" : "secondary"} className="text-sm">
-                      {details.status === "open" ? "Open" : "Resolved"}
-                    </Badge>
-                    <Badge variant="outline" className="text-sm">
-                      Priority: {details.priority}
-                    </Badge>
-                  </div>
-                </div>
-              </div>
-            </div>
+        <div className="grid md:grid-cols-2 gap-4 text-sm mb-6">
+          <div className="flex items-center gap-2">
+            <Calendar className="h-4 w-4 text-muted-foreground" />
+            <span className="text-muted-foreground">Date:</span>
+            <span className="font-semibold text-foreground">{details.date}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Clock className="h-4 w-4 text-muted-foreground" />
+            <span className="text-muted-foreground">Labor Hours:</span>
+            <span className="font-semibold text-foreground">{details.laborHours}h</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <User className="h-4 w-4 text-muted-foreground" />
+            <span className="text-muted-foreground">Reported By:</span>
+            <span className="font-semibold text-foreground text-xs">{details.reportedBy}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Wrench className="h-4 w-4 text-muted-foreground" />
+            <span className="text-muted-foreground">Assigned To:</span>
+            <span className="font-semibold text-foreground text-xs">{details.assignedTo}</span>
+          </div>
+        </div>
 
-            <div className="grid md:grid-cols-2 gap-6">
-              <div className="space-y-3">
-                <div className="flex items-center gap-2 text-foreground">
-                  <Calendar className="h-5 w-5 text-muted-foreground" />
-                  <span className="text-sm text-muted-foreground">Date Reported:</span>
-                  <span className="font-semibold">{details.date}</span>
-                </div>
-                <div className="flex items-center gap-2 text-foreground">
-                  <User className="h-5 w-5 text-muted-foreground" />
-                  <span className="text-sm text-muted-foreground">Reported By:</span>
-                  <span className="font-semibold">{details.reportedBy}</span>
-                </div>
-                <div className="flex items-center gap-2 text-foreground">
-                  <Wrench className="h-5 w-5 text-muted-foreground" />
-                  <span className="text-sm text-muted-foreground">Assigned To:</span>
-                  <span className="font-semibold">{details.assignedTo}</span>
-                </div>
-              </div>
-              <div className="space-y-3">
-                <div className="flex items-center gap-2 text-foreground">
-                  <Clock className="h-5 w-5 text-muted-foreground" />
-                  <span className="text-sm text-muted-foreground">Labor Hours:</span>
-                  <span className="font-semibold">{details.laborHours}h</span>
-                </div>
-                {details.estimatedCompletion && (
-                  <div className="flex items-center gap-2 text-foreground">
-                    <Calendar className="h-5 w-5 text-muted-foreground" />
-                    <span className="text-sm text-muted-foreground">Est. Completion:</span>
-                    <span className="font-semibold">{details.estimatedCompletion}</span>
-                  </div>
-                )}
-              </div>
-            </div>
-          </Card>
+        <div className="space-y-4">
+          <div>
+            <h3 className="font-bold text-foreground mb-2">Description</h3>
+            <p className="text-foreground text-sm leading-relaxed">{details.description}</p>
+          </div>
 
-          {/* Description */}
-          <Card className="p-6 bg-card/60 backdrop-blur-sm border-border shadow-lg">
-            <h2 className="text-xl font-bold text-foreground mb-4">Description</h2>
-            <p className="text-foreground leading-relaxed">{details.description}</p>
-          </Card>
-
-          {/* Findings */}
-          <Card className="p-6 bg-card/60 backdrop-blur-sm border-border shadow-lg">
-            <h2 className="text-xl font-bold text-foreground mb-4">Findings</h2>
-            <ul className="space-y-2">
-              {details.findings.map((finding, index) => (
-                <li key={index} className="flex items-start gap-2 text-foreground">
-                  <span className="text-primary mt-1">•</span>
+          <div>
+            <h3 className="font-bold text-foreground mb-2">Findings</h3>
+            <ul className="space-y-1">
+              {details.findings.slice(0, 3).map((finding, index) => (
+                <li key={index} className="flex items-start gap-2 text-foreground text-sm">
+                  <span className="text-primary mt-0.5">•</span>
                   <span>{finding}</span>
                 </li>
               ))}
             </ul>
-          </Card>
+          </div>
 
-          {/* Actions Performed */}
-          <Card className="p-6 bg-card/60 backdrop-blur-sm border-border shadow-lg">
-            <h2 className="text-xl font-bold text-foreground mb-4">Actions Performed</h2>
-            <ul className="space-y-2">
-              {details.actionsPerformed.map((action, index) => (
-                <li key={index} className="flex items-start gap-2 text-foreground">
-                  <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+          <div>
+            <h3 className="font-bold text-foreground mb-2">Actions Performed</h3>
+            <ul className="space-y-1">
+              {details.actionsPerformed.slice(0, 3).map((action, index) => (
+                <li key={index} className="flex items-start gap-2 text-foreground text-sm">
+                  <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
                   <span>{action}</span>
                 </li>
               ))}
             </ul>
-          </Card>
+          </div>
 
-          {/* Parts Replaced */}
           {details.partsReplaced && details.partsReplaced.length > 0 && (
-            <Card className="p-6 bg-card/60 backdrop-blur-sm border-border shadow-lg">
-              <h2 className="text-xl font-bold text-foreground mb-4">Parts Replaced</h2>
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-border">
-                      <th className="text-left py-3 px-4 text-foreground font-semibold">Part Description</th>
-                      <th className="text-left py-3 px-4 text-foreground font-semibold">Part Number</th>
-                      <th className="text-right py-3 px-4 text-foreground font-semibold">Quantity</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {details.partsReplaced.map((part, index) => (
-                      <tr key={index} className="border-b border-border/50">
-                        <td className="py-3 px-4 text-foreground">{part.part}</td>
-                        <td className="py-3 px-4 text-muted-foreground font-mono text-sm">{part.partNumber}</td>
-                        <td className="py-3 px-4 text-foreground text-right">{part.quantity}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+            <div>
+              <h3 className="font-bold text-foreground mb-2">Parts Replaced</h3>
+              <div className="space-y-1">
+                {details.partsReplaced.slice(0, 2).map((part, index) => (
+                  <div key={index} className="text-sm text-foreground">
+                    • {part.part} ({part.partNumber}) x{part.quantity}
+                  </div>
+                ))}
               </div>
-            </Card>
+            </div>
           )}
 
-          {/* Next Action */}
           {details.nextAction && (
-            <Card className="p-6 bg-warning/10 backdrop-blur-sm border-warning/30 shadow-lg">
-              <h2 className="text-xl font-bold text-foreground mb-4">Next Action Required</h2>
-              <p className="text-foreground">{details.nextAction}</p>
-            </Card>
+            <div className="bg-warning/10 p-3 rounded-lg border border-warning/30">
+              <h3 className="font-bold text-foreground mb-1 text-sm">Next Action Required</h3>
+              <p className="text-foreground text-sm">{details.nextAction}</p>
+            </div>
           )}
 
-          {/* Attachments */}
-          <Card className="p-6 bg-card/60 backdrop-blur-sm border-border shadow-lg">
-            <h2 className="text-xl font-bold text-foreground mb-4 flex items-center gap-2">
-              <FileText className="h-5 w-5" />
-              Attachments
-            </h2>
-            <div className="grid md:grid-cols-2 gap-3">
-              {details.attachments.map((attachment, index) => (
-                <div
-                  key={index}
-                  className="flex items-center gap-3 p-3 bg-secondary/30 rounded-lg border border-border hover:bg-secondary/50 transition-colors cursor-pointer"
-                >
-                  <FileText className="h-5 w-5 text-primary flex-shrink-0" />
-                  <span className="text-foreground text-sm truncate">{attachment}</span>
-                </div>
+          <div>
+            <h3 className="font-bold text-foreground mb-2 flex items-center gap-2 text-sm">
+              <FileText className="h-4 w-4" />
+              Attachments ({details.attachments.length})
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              {details.attachments.slice(0, 3).map((attachment, index) => (
+                <Badge key={index} variant="outline" className="text-xs">
+                  {attachment.split('_')[0]}...
+                </Badge>
               ))}
             </div>
-          </Card>
+          </div>
         </div>
-      </main>
+      </Card>
     </div>
   );
 };
-
-export default MaintenanceDetail;

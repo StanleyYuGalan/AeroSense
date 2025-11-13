@@ -1,7 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { AlertTriangle, CheckCircle2, ChevronRight } from "lucide-react";
-import { Link } from "react-router-dom";
 
 export interface LogEntry {
   id: string;
@@ -43,16 +42,25 @@ export const logEntries: LogEntry[] = [
   },
 ];
 
-export const MaintenanceLog = () => {
+interface MaintenanceLogProps {
+  selectedId?: string;
+  onSelectEntry: (id: string) => void;
+}
+
+export const MaintenanceLog = ({ selectedId, onSelectEntry }: MaintenanceLogProps) => {
   return (
     <Card className="p-6 bg-card/60 backdrop-blur-sm border-border shadow-lg">
       <h2 className="text-2xl font-bold text-foreground mb-6">Maintenance Log</h2>
       <div className="space-y-4">
         {logEntries.map((entry) => (
-          <Link
+          <button
             key={entry.id}
-            to={`/maintenance/${entry.id}`}
-            className="flex items-start justify-between p-4 bg-secondary/30 rounded-lg border border-border hover:bg-secondary/50 transition-all hover:border-primary/50 cursor-pointer group"
+            onClick={() => onSelectEntry(entry.id)}
+            className={`w-full flex items-start justify-between p-4 bg-secondary/30 rounded-lg border transition-all cursor-pointer group text-left ${
+              selectedId === entry.id
+                ? "border-primary bg-secondary/60"
+                : "border-border hover:bg-secondary/50 hover:border-primary/50"
+            }`}
           >
             <div className="flex items-start gap-3 flex-1">
               {entry.status === "open" ? (
@@ -61,7 +69,9 @@ export const MaintenanceLog = () => {
                 <CheckCircle2 className="h-6 w-6 text-primary mt-1" />
               )}
               <div className="flex-1">
-                <p className="font-semibold text-foreground group-hover:text-primary transition-colors">
+                <p className={`font-semibold transition-colors ${
+                  selectedId === entry.id ? "text-primary" : "text-foreground group-hover:text-primary"
+                }`}>
                   {entry.title}
                 </p>
                 <Badge
@@ -76,9 +86,11 @@ export const MaintenanceLog = () => {
               <span className="text-sm text-muted-foreground whitespace-nowrap">
                 {entry.date}
               </span>
-              <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
+              <ChevronRight className={`h-5 w-5 transition-colors ${
+                selectedId === entry.id ? "text-primary" : "text-muted-foreground group-hover:text-primary"
+              }`} />
             </div>
-          </Link>
+          </button>
         ))}
       </div>
     </Card>
