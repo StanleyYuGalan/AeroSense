@@ -47,6 +47,9 @@ All colors MUST be HSL.
     
     --gradient-start: 210 60% 8%;
     --gradient-end: 213 50% 15%;
+    
+    --shadow-subtle: 0 0 20px hsl(var(--primary) / 0.15);
+    --shadow-glow: 0 0 30px hsl(var(--primary) / 0.25);
   }
 }
 
