@@ -3,10 +3,57 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
 import { Plane, AlertTriangle, CheckCircle, Clock, TrendingUp, Wrench, BarChart3 } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from "recharts";
 import a350Image from "@/assets/a350.jpg";
 import a380Image from "@/assets/a380.jpg";
 import boeing777_300Image from "@/assets/777-300er.jpeg";
 import boeing777_200Image from "@/assets/777-200lr.avif";
+
+// Analytics data
+const fleetAgeData = [
+  { year: "2019", age: 3.2 },
+  { year: "2020", age: 4.1 },
+  { year: "2021", age: 4.8 },
+  { year: "2022", age: 5.3 },
+  { year: "2023", age: 5.9 },
+  { year: "2024", age: 6.2 },
+];
+
+const maintenanceCostData = [
+  { month: "Jul", cost: 2.4 },
+  { month: "Aug", cost: 2.8 },
+  { month: "Sep", cost: 2.2 },
+  { month: "Oct", cost: 3.1 },
+  { month: "Nov", cost: 2.6 },
+  { month: "Dec", cost: 3.4 },
+  { month: "Jan", cost: 2.9 },
+];
+
+const incidentData = [
+  { year: "2019", incidents: 3 },
+  { year: "2020", incidents: 5 },
+  { year: "2021", incidents: 2 },
+  { year: "2022", incidents: 4 },
+  { year: "2023", incidents: 1 },
+  { year: "2024", incidents: 2 },
+];
+
+const chartConfig = {
+  age: {
+    label: "Avg Age (years)",
+    color: "hsl(var(--chart-2))",
+  },
+  cost: {
+    label: "Cost ($M)",
+    color: "hsl(var(--chart-1))",
+  },
+  incidents: {
+    label: "Incidents",
+    color: "hsl(var(--chart-3))",
+  },
+};
 
 const fleetData = [
   {
@@ -204,6 +251,120 @@ const Fleet = () => {
             </CardContent>
           </Card>
         </div>
+
+        {/* Analytics Dashboard with Tabs */}
+        <Card className="bg-card/60 backdrop-blur-sm border-border/50 mb-8">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <TrendingUp className="h-5 w-5 text-primary" />
+              Fleet Analytics Dashboard
+            </CardTitle>
+            <CardDescription>Comprehensive insights and trends analysis</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Tabs defaultValue="age" className="w-full">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="age">Fleet Age</TabsTrigger>
+                <TabsTrigger value="costs">Maintenance Costs</TabsTrigger>
+                <TabsTrigger value="incidents">Incidents</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="age" className="space-y-4">
+                <div className="space-y-2">
+                  <h4 className="text-sm font-medium text-foreground">Average Fleet Age Over Time</h4>
+                  <p className="text-xs text-muted-foreground">Tracking the average age of aircraft in the fleet</p>
+                </div>
+                <ChartContainer config={chartConfig} className="h-[300px] w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={fleetAgeData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                      <XAxis 
+                        dataKey="year" 
+                        stroke="hsl(var(--muted-foreground))"
+                        fontSize={12}
+                      />
+                      <YAxis 
+                        stroke="hsl(var(--muted-foreground))"
+                        fontSize={12}
+                        label={{ value: 'Years', angle: -90, position: 'insideLeft' }}
+                      />
+                      <ChartTooltip content={<ChartTooltipContent />} />
+                      <Line 
+                        type="monotone" 
+                        dataKey="age" 
+                        stroke="hsl(var(--chart-2))" 
+                        strokeWidth={2}
+                        dot={{ fill: "hsl(var(--chart-2))", r: 4 }}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </ChartContainer>
+              </TabsContent>
+
+              <TabsContent value="costs" className="space-y-4">
+                <div className="space-y-2">
+                  <h4 className="text-sm font-medium text-foreground">Maintenance Cost Trends</h4>
+                  <p className="text-xs text-muted-foreground">Monthly maintenance expenditure across the fleet</p>
+                </div>
+                <ChartContainer config={chartConfig} className="h-[300px] w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={maintenanceCostData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                      <XAxis 
+                        dataKey="month" 
+                        stroke="hsl(var(--muted-foreground))"
+                        fontSize={12}
+                      />
+                      <YAxis 
+                        stroke="hsl(var(--muted-foreground))"
+                        fontSize={12}
+                        label={{ value: 'Cost ($M)', angle: -90, position: 'insideLeft' }}
+                      />
+                      <ChartTooltip content={<ChartTooltipContent />} />
+                      <Bar 
+                        dataKey="cost" 
+                        fill="hsl(var(--chart-1))" 
+                        radius={[4, 4, 0, 0]}
+                      />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </ChartContainer>
+              </TabsContent>
+
+              <TabsContent value="incidents" className="space-y-4">
+                <div className="space-y-2">
+                  <h4 className="text-sm font-medium text-foreground">Incidents Per Year</h4>
+                  <p className="text-xs text-muted-foreground">Historical incident tracking and safety trends</p>
+                </div>
+                <ChartContainer config={chartConfig} className="h-[300px] w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={incidentData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                      <XAxis 
+                        dataKey="year" 
+                        stroke="hsl(var(--muted-foreground))"
+                        fontSize={12}
+                      />
+                      <YAxis 
+                        stroke="hsl(var(--muted-foreground))"
+                        fontSize={12}
+                        label={{ value: 'Incidents', angle: -90, position: 'insideLeft' }}
+                      />
+                      <ChartTooltip content={<ChartTooltipContent />} />
+                      <Line 
+                        type="monotone" 
+                        dataKey="incidents" 
+                        stroke="hsl(var(--chart-3))" 
+                        strokeWidth={2}
+                        dot={{ fill: "hsl(var(--chart-3))", r: 4 }}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </ChartContainer>
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
 
         {/* Fleet Composition and Maintenance Schedule */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
