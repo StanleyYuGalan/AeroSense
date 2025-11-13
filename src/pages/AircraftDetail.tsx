@@ -1,4 +1,5 @@
 import { useParams, Link } from "react-router-dom";
+import { useState } from "react";
 import { Header } from "@/components/Header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -6,7 +7,8 @@ import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { ArrowLeft, Plane, MapPin, Clock, AlertTriangle, CheckCircle, Wrench, FileText, Calendar, XCircle, ChevronDown } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ArrowLeft, Plane, MapPin, Clock, AlertTriangle, CheckCircle, Wrench, FileText, Calendar, XCircle, ChevronDown, User, ClipboardCheck, Settings } from "lucide-react";
 import a350Image from "@/assets/a350.jpg";
 import a380Image from "@/assets/a380.jpg";
 import boeing777_300Image from "@/assets/777-300er.jpeg";
@@ -425,10 +427,66 @@ const recentFlights = [
 ];
 
 const maintenanceHistory = [
-  { date: "2024-01-05", type: "A-Check", description: "Routine inspection and servicing", technician: "John Smith", duration: "8 hours" },
-  { date: "2023-12-10", type: "Component Replacement", description: "Replaced navigation sensor unit", technician: "Sarah Johnson", duration: "4 hours" },
-  { date: "2023-11-20", type: "Software Update", description: "FMS software upgrade v8.2.1", technician: "Mike Chen", duration: "2 hours" },
-  { date: "2023-10-15", type: "B-Check", description: "Extended inspection and maintenance", technician: "John Smith", duration: "48 hours" },
+  { 
+    id: "MX-001",
+    date: "2024-01-05", 
+    type: "A-Check", 
+    description: "Routine inspection and servicing", 
+    technician: "John Smith", 
+    duration: "8 hours",
+    location: "Emirates Engineering - Dubai",
+    workOrders: ["WO-2024-0105", "WO-2024-0106"],
+    partsReplaced: ["Oil Filter", "Hydraulic Fluid"],
+    findings: "All systems within normal parameters. Minor hydraulic fluid leak detected and repaired.",
+    status: "Completed",
+    signOffBy: "Chief Engineer Michael Brown",
+    certification: "EASA Part-145 Certified"
+  },
+  { 
+    id: "MX-002",
+    date: "2023-12-10", 
+    type: "Component Replacement", 
+    description: "Replaced navigation sensor unit", 
+    technician: "Sarah Johnson", 
+    duration: "4 hours",
+    location: "Emirates Engineering - Dubai",
+    workOrders: ["WO-2023-1210"],
+    partsReplaced: ["Navigation Sensor Unit (NSU-200)", "Mounting Bracket"],
+    findings: "Navigation sensor showing intermittent signal loss. Unit replaced with new certified part.",
+    status: "Completed",
+    signOffBy: "Senior Technician David Lee",
+    certification: "EASA Part-145 Certified"
+  },
+  { 
+    id: "MX-003",
+    date: "2023-11-20", 
+    type: "Software Update", 
+    description: "FMS software upgrade v8.2.1", 
+    technician: "Mike Chen", 
+    duration: "2 hours",
+    location: "Emirates Engineering - Dubai",
+    workOrders: ["WO-2023-1120"],
+    partsReplaced: [],
+    findings: "Software upgrade completed successfully. All post-update tests passed.",
+    status: "Completed",
+    signOffBy: "Avionics Specialist Robert Taylor",
+    certification: "OEM Authorized"
+  },
+  { 
+    id: "MX-004",
+    date: "2023-10-15", 
+    type: "B-Check", 
+    description: "Extended inspection and maintenance", 
+    technician: "John Smith", 
+    duration: "48 hours",
+    location: "Emirates Engineering - Dubai",
+    workOrders: ["WO-2023-1015", "WO-2023-1016", "WO-2023-1017"],
+    partsReplaced: ["Landing Gear Tires (x6)", "Brake Pads (x12)", "APU Filter", "Cabin Air Filters"],
+    findings: "Comprehensive inspection completed. Landing gear tires at 75% wear - replaced as preventive maintenance. All structural inspections passed.",
+    status: "Completed",
+    signOffBy: "Chief Engineer Michael Brown",
+    certification: "EASA Part-145 Certified"
+  },
 ];
 
 const getStatusColor = (status: string) => {
@@ -480,6 +538,7 @@ const getSeverityIcon = (severity: string) => {
 const AircraftDetail = () => {
   const { id } = useParams<{ id: string }>();
   const aircraft = id ? aircraftDatabase[id] : null;
+  const [selectedMaintenance, setSelectedMaintenance] = useState<typeof maintenanceHistory[0] | null>(null);
 
   if (!aircraft) {
   return (
@@ -688,15 +747,19 @@ const AircraftDetail = () => {
               </Card>
 
               {/* Recent Maintenance Log */}
-              <Card className="bg-card/60 backdrop-blur-sm">
+              <Card className="bg-card/60 backdrop-blur-lg border-border/30">
                 <CardHeader>
                   <CardTitle>Recent Maintenance Log</CardTitle>
-                  <CardDescription>Latest maintenance activities</CardDescription>
+                  <CardDescription>Latest maintenance activities (Click for details)</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
                     {maintenanceHistory.slice(0, 3).map((entry, index) => (
-                      <div key={index} className="p-3 border border-border/50 rounded-lg">
+                      <div 
+                        key={index} 
+                        onClick={() => setSelectedMaintenance(entry)}
+                        className="p-3 border border-border/50 rounded-lg cursor-pointer hover:border-primary/50 hover:bg-muted/30 transition-all"
+                      >
                         <div className="flex items-start justify-between mb-2">
                           <div className="flex items-center gap-2">
                             <Wrench className="h-4 w-4 text-primary" />
@@ -868,20 +931,25 @@ const AircraftDetail = () => {
           </TabsContent>
 
           <TabsContent value="maintenance">
-            <Card className="bg-card/60 backdrop-blur-sm">
+            <Card className="bg-card/40 backdrop-blur-md">
               <CardHeader>
                 <CardTitle>Maintenance History</CardTitle>
-                <CardDescription>Recent maintenance activities and checks</CardDescription>
+                <CardDescription>Recent maintenance activities and checks (Click for details)</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   {maintenanceHistory.map((entry, index) => (
-                    <div key={index} className="p-4 border border-border/50 rounded-lg">
+                    <div 
+                      key={index} 
+                      onClick={() => setSelectedMaintenance(entry)}
+                      className="p-4 border border-border/50 rounded-lg cursor-pointer hover:border-primary/50 hover:bg-muted/30 transition-all"
+                    >
                       <div className="flex items-start justify-between mb-2">
                         <div>
                           <div className="flex items-center gap-2 mb-1">
                             <Wrench className="h-4 w-4 text-primary" />
                             <span className="font-bold text-foreground">{entry.type}</span>
+                            <Badge variant="outline" className="text-xs">{entry.id}</Badge>
                           </div>
                           <p className="text-sm text-muted-foreground">{entry.description}</p>
                         </div>
@@ -897,6 +965,138 @@ const AircraftDetail = () => {
               </CardContent>
             </Card>
           </TabsContent>
+
+          {/* Maintenance Detail Modal */}
+          <Dialog open={!!selectedMaintenance} onOpenChange={() => setSelectedMaintenance(null)}>
+            <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto bg-card/95 backdrop-blur-xl border-border/30">
+              <DialogHeader>
+                <DialogTitle className="text-2xl flex items-center gap-3">
+                  <ClipboardCheck className="h-6 w-6 text-primary" />
+                  Maintenance Log Details
+                </DialogTitle>
+                <DialogDescription>
+                  Complete maintenance record and documentation
+                </DialogDescription>
+              </DialogHeader>
+
+              {selectedMaintenance && (
+                <div className="space-y-6 mt-4">
+                  {/* Header Info */}
+                  <div className="grid grid-cols-2 gap-4 p-4 bg-muted/30 rounded-lg border border-border/30">
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-1">Maintenance ID</p>
+                      <p className="font-semibold text-foreground">{selectedMaintenance.id}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-1">Type</p>
+                      <Badge variant="secondary" className="font-semibold">{selectedMaintenance.type}</Badge>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-1">Date</p>
+                      <p className="font-semibold text-foreground">{selectedMaintenance.date}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-1">Status</p>
+                      <Badge variant="outline" className="text-green-500 border-green-500">{selectedMaintenance.status}</Badge>
+                    </div>
+                  </div>
+
+                  {/* Description */}
+                  <div>
+                    <h4 className="font-semibold text-foreground mb-2 flex items-center gap-2">
+                      <FileText className="h-4 w-4 text-primary" />
+                      Description
+                    </h4>
+                    <p className="text-sm text-muted-foreground p-3 bg-muted/20 rounded border border-border/30">
+                      {selectedMaintenance.description}
+                    </p>
+                  </div>
+
+                  {/* Findings */}
+                  <div>
+                    <h4 className="font-semibold text-foreground mb-2 flex items-center gap-2">
+                      <AlertTriangle className="h-4 w-4 text-primary" />
+                      Findings & Actions
+                    </h4>
+                    <p className="text-sm text-muted-foreground p-3 bg-muted/20 rounded border border-border/30">
+                      {selectedMaintenance.findings}
+                    </p>
+                  </div>
+
+                  {/* Personnel & Location */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <h4 className="font-semibold text-foreground mb-2 flex items-center gap-2">
+                        <User className="h-4 w-4 text-primary" />
+                        Personnel
+                      </h4>
+                      <div className="space-y-2 p-3 bg-muted/20 rounded border border-border/30">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">Lead Technician:</span>
+                          <span className="font-medium text-foreground">{selectedMaintenance.technician}</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">Sign-off By:</span>
+                          <span className="font-medium text-foreground">{selectedMaintenance.signOffBy}</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">Certification:</span>
+                          <Badge variant="outline" className="text-xs">{selectedMaintenance.certification}</Badge>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <h4 className="font-semibold text-foreground mb-2 flex items-center gap-2">
+                        <MapPin className="h-4 w-4 text-primary" />
+                        Location & Duration
+                      </h4>
+                      <div className="space-y-2 p-3 bg-muted/20 rounded border border-border/30">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">Location:</span>
+                          <span className="font-medium text-foreground">{selectedMaintenance.location}</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">Duration:</span>
+                          <span className="font-medium text-foreground">{selectedMaintenance.duration}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Work Orders */}
+                  <div>
+                    <h4 className="font-semibold text-foreground mb-2 flex items-center gap-2">
+                      <FileText className="h-4 w-4 text-primary" />
+                      Work Orders
+                    </h4>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedMaintenance.workOrders.map((wo, idx) => (
+                        <Badge key={idx} variant="secondary">{wo}</Badge>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Parts Replaced */}
+                  {selectedMaintenance.partsReplaced.length > 0 && (
+                    <div>
+                      <h4 className="font-semibold text-foreground mb-2 flex items-center gap-2">
+                        <Settings className="h-4 w-4 text-primary" />
+                        Parts Replaced
+                      </h4>
+                      <div className="space-y-2">
+                        {selectedMaintenance.partsReplaced.map((part, idx) => (
+                          <div key={idx} className="p-2 bg-muted/20 rounded border border-border/30 text-sm text-foreground">
+                            • {part}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </DialogContent>
+          </Dialog>
 
           <TabsContent value="documents">
             <Card className="bg-card/60 backdrop-blur-sm">
