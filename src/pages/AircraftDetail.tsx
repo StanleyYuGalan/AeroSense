@@ -5,7 +5,8 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { ArrowLeft, Plane, MapPin, Clock, AlertTriangle, CheckCircle, Wrench, FileText, Calendar, XCircle } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { ArrowLeft, Plane, MapPin, Clock, AlertTriangle, CheckCircle, Wrench, FileText, Calendar, XCircle, ChevronDown } from "lucide-react";
 import a350Image from "@/assets/a350.jpg";
 import a380Image from "@/assets/a380.jpg";
 import boeing777_300Image from "@/assets/777-300er.jpeg";
@@ -233,14 +234,187 @@ const aircraftDatabase: Record<string, any> = {
 };
 
 const systemsData = [
-  { name: "Hydraulics", status: "optimal", health: 98 },
-  { name: "Electrical", status: "optimal", health: 96 },
-  { name: "Fuel System", status: "good", health: 94 },
-  { name: "APU", status: "optimal", health: 97 },
-  { name: "Landing Gear", status: "good", health: 92 },
-  { name: "Navigation", status: "optimal", health: 99 },
-  { name: "Communication", status: "optimal", health: 98 },
-  { name: "Pressurization", status: "good", health: 95 },
+  { 
+    name: "Hydraulics", 
+    status: "optimal", 
+    healthy: 17, 
+    total: 17,
+    components: [
+      { name: "Primary Pump A", status: "operational" },
+      { name: "Primary Pump B", status: "operational" },
+      { name: "Backup Pump", status: "operational" },
+      { name: "Reservoir A", status: "operational" },
+      { name: "Reservoir B", status: "operational" },
+      { name: "Pressure Sensor 1", status: "operational" },
+      { name: "Pressure Sensor 2", status: "operational" },
+      { name: "Pressure Sensor 3", status: "operational" },
+      { name: "Flow Control Valve A", status: "operational" },
+      { name: "Flow Control Valve B", status: "operational" },
+      { name: "Accumulator A", status: "operational" },
+      { name: "Accumulator B", status: "operational" },
+      { name: "Filter Assembly A", status: "operational" },
+      { name: "Filter Assembly B", status: "operational" },
+      { name: "Pressure Relief Valve", status: "operational" },
+      { name: "Temperature Sensor A", status: "operational" },
+      { name: "Temperature Sensor B", status: "operational" },
+    ]
+  },
+  { 
+    name: "Electrical", 
+    status: "optimal", 
+    healthy: 23, 
+    total: 24,
+    components: [
+      { name: "Main Generator 1", status: "operational" },
+      { name: "Main Generator 2", status: "operational" },
+      { name: "APU Generator", status: "operational" },
+      { name: "Battery 1", status: "operational" },
+      { name: "Battery 2", status: "operational" },
+      { name: "AC Bus 1", status: "operational" },
+      { name: "AC Bus 2", status: "operational" },
+      { name: "DC Bus 1", status: "operational" },
+      { name: "DC Bus 2", status: "operational" },
+      { name: "Essential Bus", status: "operational" },
+      { name: "Transformer Rectifier 1", status: "operational" },
+      { name: "Transformer Rectifier 2", status: "operational" },
+      { name: "Static Inverter", status: "operational" },
+      { name: "External Power Receptacle", status: "operational" },
+      { name: "Bus Tie Contactor 1", status: "operational" },
+      { name: "Bus Tie Contactor 2", status: "operational" },
+      { name: "Generator Control Unit 1", status: "operational" },
+      { name: "Generator Control Unit 2", status: "operational" },
+      { name: "Circuit Breaker Panel A", status: "operational" },
+      { name: "Circuit Breaker Panel B", status: "operational" },
+      { name: "Circuit Breaker Panel C", status: "operational" },
+      { name: "Voltage Regulator 1", status: "operational" },
+      { name: "Voltage Regulator 2", status: "operational" },
+      { name: "Emergency Battery", status: "maintenance" },
+    ]
+  },
+  { 
+    name: "Fuel System", 
+    status: "good", 
+    healthy: 14, 
+    total: 15,
+    components: [
+      { name: "Center Tank Pump 1", status: "operational" },
+      { name: "Center Tank Pump 2", status: "operational" },
+      { name: "Left Wing Pump 1", status: "operational" },
+      { name: "Left Wing Pump 2", status: "operational" },
+      { name: "Right Wing Pump 1", status: "operational" },
+      { name: "Right Wing Pump 2", status: "operational" },
+      { name: "Fuel Flow Sensor L", status: "operational" },
+      { name: "Fuel Flow Sensor R", status: "operational" },
+      { name: "Fuel Quantity Indicator 1", status: "operational" },
+      { name: "Fuel Quantity Indicator 2", status: "operational" },
+      { name: "Fuel Valve Center", status: "operational" },
+      { name: "Fuel Valve Left", status: "operational" },
+      { name: "Fuel Valve Right", status: "operational" },
+      { name: "Crossfeed Valve", status: "operational" },
+      { name: "Fuel Temperature Sensor", status: "maintenance" },
+    ]
+  },
+  { 
+    name: "APU", 
+    status: "optimal", 
+    healthy: 8, 
+    total: 8,
+    components: [
+      { name: "APU Controller", status: "operational" },
+      { name: "Starter Motor", status: "operational" },
+      { name: "Fuel Pump", status: "operational" },
+      { name: "Oil Pump", status: "operational" },
+      { name: "Inlet Door Actuator", status: "operational" },
+      { name: "Bleed Air Valve", status: "operational" },
+      { name: "EGT Sensor", status: "operational" },
+      { name: "Fire Detection System", status: "operational" },
+    ]
+  },
+  { 
+    name: "Landing Gear", 
+    status: "good", 
+    healthy: 11, 
+    total: 12,
+    components: [
+      { name: "Nose Gear Actuator", status: "operational" },
+      { name: "Left Main Gear Actuator", status: "operational" },
+      { name: "Right Main Gear Actuator", status: "operational" },
+      { name: "Gear Door Actuator NL", status: "operational" },
+      { name: "Gear Door Actuator NR", status: "operational" },
+      { name: "Gear Door Actuator LM", status: "operational" },
+      { name: "Gear Door Actuator RM", status: "operational" },
+      { name: "Position Sensor Nose", status: "operational" },
+      { name: "Position Sensor Left", status: "operational" },
+      { name: "Position Sensor Right", status: "operational" },
+      { name: "Proximity Switch Nose", status: "maintenance" },
+      { name: "Anti-Skid Control Unit", status: "operational" },
+    ]
+  },
+  { 
+    name: "Navigation", 
+    status: "optimal", 
+    healthy: 19, 
+    total: 19,
+    components: [
+      { name: "GPS Receiver 1", status: "operational" },
+      { name: "GPS Receiver 2", status: "operational" },
+      { name: "GPS Receiver 3", status: "operational" },
+      { name: "IRS Unit 1", status: "operational" },
+      { name: "IRS Unit 2", status: "operational" },
+      { name: "IRS Unit 3", status: "operational" },
+      { name: "VOR/LOC Receiver 1", status: "operational" },
+      { name: "VOR/LOC Receiver 2", status: "operational" },
+      { name: "DME Interrogator 1", status: "operational" },
+      { name: "DME Interrogator 2", status: "operational" },
+      { name: "ADF Receiver 1", status: "operational" },
+      { name: "ADF Receiver 2", status: "operational" },
+      { name: "Radio Altimeter 1", status: "operational" },
+      { name: "Radio Altimeter 2", status: "operational" },
+      { name: "TCAS Computer", status: "operational" },
+      { name: "Weather Radar", status: "operational" },
+      { name: "FMS 1", status: "operational" },
+      { name: "FMS 2", status: "operational" },
+      { name: "FMS 3", status: "operational" },
+    ]
+  },
+  { 
+    name: "Communication", 
+    status: "optimal", 
+    healthy: 12, 
+    total: 12,
+    components: [
+      { name: "VHF Radio 1", status: "operational" },
+      { name: "VHF Radio 2", status: "operational" },
+      { name: "VHF Radio 3", status: "operational" },
+      { name: "HF Radio 1", status: "operational" },
+      { name: "HF Radio 2", status: "operational" },
+      { name: "SATCOM Transceiver", status: "operational" },
+      { name: "Transponder 1", status: "operational" },
+      { name: "Transponder 2", status: "operational" },
+      { name: "ACARS Unit", status: "operational" },
+      { name: "Audio Control Panel 1", status: "operational" },
+      { name: "Audio Control Panel 2", status: "operational" },
+      { name: "CVR (Cockpit Voice Recorder)", status: "operational" },
+    ]
+  },
+  { 
+    name: "Pressurization", 
+    status: "good", 
+    healthy: 9, 
+    total: 10,
+    components: [
+      { name: "Outflow Valve 1", status: "operational" },
+      { name: "Outflow Valve 2", status: "operational" },
+      { name: "Cabin Pressure Controller", status: "operational" },
+      { name: "Safety Valve Forward", status: "operational" },
+      { name: "Safety Valve Aft", status: "operational" },
+      { name: "Pressure Sensor Forward", status: "operational" },
+      { name: "Pressure Sensor Aft", status: "operational" },
+      { name: "Differential Pressure Sensor", status: "operational" },
+      { name: "Cabin Altitude Sensor", status: "maintenance" },
+      { name: "Manual Control", status: "operational" },
+    ]
+  },
 ];
 
 const recentFlights = [
@@ -599,24 +773,60 @@ const AircraftDetail = () => {
             <Card className="bg-card/60 backdrop-blur-sm">
               <CardHeader>
                 <CardTitle>System Health Overview</CardTitle>
-                <CardDescription>Real-time monitoring of aircraft systems</CardDescription>
+                <CardDescription>Component-level monitoring of aircraft systems</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-6">
+                <div className="space-y-3">
                   {systemsData.map((system) => (
-                    <div key={system.name} className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <CheckCircle className={`h-4 w-4 ${getHealthColor(system.health)}`} />
-                          <span className="font-medium text-foreground">{system.name}</span>
+                    <Collapsible key={system.name} className="border border-border/50 rounded-lg">
+                      <CollapsibleTrigger className="w-full p-4 hover:bg-muted/50 transition-colors">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <CheckCircle className={`h-5 w-5 ${system.healthy === system.total ? 'text-green-500' : 'text-yellow-500'}`} />
+                            <span className="font-semibold text-foreground">{system.name}</span>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <span className={`text-sm font-medium ${system.healthy === system.total ? 'text-green-500' : 'text-yellow-500'}`}>
+                              {system.healthy}/{system.total}
+                            </span>
+                            <Badge variant="outline" className="capitalize">{system.status}</Badge>
+                            <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform duration-200" />
+                          </div>
                         </div>
-                        <div className="flex items-center gap-3">
-                          <span className={`text-sm ${getHealthColor(system.health)}`}>{system.health}%</span>
-                          <Badge variant="outline" className="capitalize">{system.status}</Badge>
+                        <div className="mt-3">
+                          <Progress value={(system.healthy / system.total) * 100} className="h-2" />
                         </div>
-                      </div>
-                      <Progress value={system.health} className="h-2" />
-                    </div>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent>
+                        <div className="px-4 pb-4 pt-2 space-y-2 bg-muted/20">
+                          <p className="text-xs font-semibold text-muted-foreground mb-2">COMPONENT DETAILS</p>
+                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+                            {system.components.map((component: any, idx: number) => (
+                              <div 
+                                key={idx} 
+                                className={`flex items-center justify-between p-2 rounded border ${
+                                  component.status === 'operational' 
+                                    ? 'border-green-500/30 bg-green-500/5' 
+                                    : 'border-yellow-500/30 bg-yellow-500/5'
+                                }`}
+                              >
+                                <span className="text-xs text-foreground">{component.name}</span>
+                                <Badge 
+                                  variant={component.status === 'operational' ? 'outline' : 'secondary'} 
+                                  className={`text-xs ${
+                                    component.status === 'operational' 
+                                      ? 'text-green-500 border-green-500' 
+                                      : 'text-yellow-500 border-yellow-500'
+                                  }`}
+                                >
+                                  {component.status === 'operational' ? 'OK' : 'MAINT'}
+                                </Badge>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </CollapsibleContent>
+                    </Collapsible>
                   ))}
                 </div>
               </CardContent>
