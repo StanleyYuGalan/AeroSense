@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { ArrowLeft, Plane, MapPin, Clock, AlertTriangle, CheckCircle, Wrench, FileText, Calendar, XCircle, ChevronDown, User, ClipboardCheck, Settings, Shield, Lock } from "lucide-react";
+import { ArrowLeft, Plane, MapPin, Clock, AlertTriangle, CheckCircle, Wrench, FileText, Calendar, XCircle, ChevronDown, User, ClipboardCheck, Settings, Shield, Lock, Users, Package, Fuel, Gauge, CloudRain } from "lucide-react";
 import a350Image from "@/assets/a350.jpg";
 import a380Image from "@/assets/a380.jpg";
 import boeing777_300Image from "@/assets/777-300er.jpeg";
@@ -629,31 +629,99 @@ const systemsData = [{
 const recentFlights = [{
   flightNo: "EK001",
   from: "DXB",
+  fromFull: "Dubai International Airport",
   to: "LHR",
+  toFull: "London Heathrow Airport",
   date: "2024-01-12",
+  departureTime: "03:45 UTC",
+  arrivalTime: "07:30 UTC",
   duration: "7h 15m",
-  status: "Completed"
+  status: "Completed",
+  distance: "5,476 km",
+  passengers: 312,
+  crew: 18,
+  cargoWeight: "12,500 kg",
+  fuelUsed: "48,200 L",
+  maxAltitude: "41,000 ft",
+  avgSpeed: "865 km/h",
+  captain: "Capt. Ahmed Al-Farsi",
+  firstOfficer: "F/O Sarah Mitchell",
+  weather: "Clear skies, Light winds",
+  delayReason: null,
+  incidents: "None reported",
+  remarks: "Smooth flight, on-time performance"
 }, {
   flightNo: "EK002",
   from: "LHR",
+  fromFull: "London Heathrow Airport",
   to: "DXB",
+  toFull: "Dubai International Airport",
   date: "2024-01-13",
+  departureTime: "20:15 UTC",
+  arrivalTime: "06:40 UTC+1",
   duration: "6h 55m",
-  status: "Completed"
+  status: "Completed",
+  distance: "5,476 km",
+  passengers: 298,
+  crew: 18,
+  cargoWeight: "14,800 kg",
+  fuelUsed: "45,800 L",
+  maxAltitude: "43,000 ft",
+  avgSpeed: "892 km/h",
+  captain: "Capt. James Wilson",
+  firstOfficer: "F/O Fatima Hassan",
+  weather: "Partly cloudy, Moderate turbulence over Alps",
+  delayReason: null,
+  incidents: "Minor turbulence at FL350, no injuries",
+  remarks: "Tailwind advantage, arrived 10 minutes early"
 }, {
   flightNo: "EK015",
   from: "DXB",
+  fromFull: "Dubai International Airport",
   to: "JFK",
+  toFull: "John F. Kennedy International Airport",
   date: "2024-01-14",
+  departureTime: "09:20 UTC",
+  arrivalTime: "14:40 EST",
   duration: "14h 20m",
-  status: "Completed"
+  status: "Completed",
+  distance: "11,020 km",
+  passengers: 315,
+  crew: 20,
+  cargoWeight: "18,200 kg",
+  fuelUsed: "92,500 L",
+  maxAltitude: "42,000 ft",
+  avgSpeed: "881 km/h",
+  captain: "Capt. Mohammad Rashid",
+  firstOfficer: "F/O Emily Chen",
+  weather: "Clear departure, Snow at destination",
+  delayReason: "15 min - Ground de-icing at JFK",
+  incidents: "None reported",
+  remarks: "De-icing performed upon arrival due to winter storm"
 }, {
   flightNo: "EK016",
   from: "JFK",
+  fromFull: "John F. Kennedy International Airport",
   to: "DXB",
+  toFull: "Dubai International Airport",
   date: "2024-01-15",
+  departureTime: "23:30 EST",
+  arrivalTime: "20:15 UTC+1",
   duration: "13h 45m",
-  status: "Completed"
+  status: "Completed",
+  distance: "11,020 km",
+  passengers: 287,
+  crew: 20,
+  cargoWeight: "16,900 kg",
+  fuelUsed: "88,300 L",
+  maxAltitude: "41,500 ft",
+  avgSpeed: "895 km/h",
+  captain: "Capt. David Thompson",
+  firstOfficer: "F/O Layla Ahmed",
+  weather: "Clear skies throughout",
+  delayReason: null,
+  incidents: "None reported",
+  remarks: "Excellent flight conditions, optimal routing"
 }];
 const maintenanceHistory = [{
   id: "MX-001",
@@ -775,6 +843,7 @@ const AircraftDetail = () => {
   const aircraft = id ? aircraftDatabase[id] : null;
   const [selectedMaintenance, setSelectedMaintenance] = useState<typeof maintenanceHistory[0] | null>(null);
   const [selectedDocument, setSelectedDocument] = useState<any>(null);
+  const [selectedFlight, setSelectedFlight] = useState<typeof recentFlights[0] | null>(null);
   const aircraftDocuments = [{
     name: "Airworthiness Certificate",
     date: "Valid until 2025-12-31",
@@ -1178,7 +1247,11 @@ const AircraftDetail = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {recentFlights.map((flight, index) => <div key={index} className="p-4 border border-border/50 rounded-lg">
+                  {recentFlights.map((flight, index) => <div 
+                      key={index} 
+                      onClick={() => setSelectedFlight(flight)}
+                      className="p-4 border border-border/50 rounded-lg cursor-pointer hover:border-primary/50 hover:bg-muted/30 transition-all"
+                    >
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-3">
                           <Plane className="h-5 w-5 text-primary" />
@@ -1192,12 +1265,185 @@ const AircraftDetail = () => {
                       <div className="flex gap-6 text-sm text-muted-foreground">
                         <span>Date: {flight.date}</span>
                         <span>Duration: {flight.duration}</span>
+                        <span>Distance: {flight.distance}</span>
                       </div>
                     </div>)}
                 </div>
               </CardContent>
             </Card>
           </TabsContent>
+
+          {/* Flight Detail Modal */}
+          <Dialog open={!!selectedFlight} onOpenChange={() => setSelectedFlight(null)}>
+            <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto bg-card/95 backdrop-blur-xl border-border/30">
+              <DialogHeader>
+                <DialogTitle className="text-2xl flex items-center gap-3">
+                  <Plane className="h-6 w-6 text-primary" />
+                  Flight Details
+                </DialogTitle>
+                <DialogDescription>
+                  Complete flight record and operational data
+                </DialogDescription>
+              </DialogHeader>
+
+              {selectedFlight && <div className="space-y-6 mt-4">
+                  {/* Flight Header */}
+                  <div className="grid grid-cols-2 gap-4 p-4 bg-muted/30 rounded-lg border border-border/30">
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-1">Flight Number</p>
+                      <p className="font-bold text-foreground text-lg">{selectedFlight.flightNo}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-1">Status</p>
+                      <Badge variant="outline" className="text-green-500 border-green-500">{selectedFlight.status}</Badge>
+                    </div>
+                    <div className="col-span-2">
+                      <p className="text-sm text-muted-foreground mb-1">Route</p>
+                      <p className="font-semibold text-foreground">
+                        {selectedFlight.fromFull} ({selectedFlight.from}) → {selectedFlight.toFull} ({selectedFlight.to})
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Flight Times */}
+                  <div>
+                    <h4 className="font-semibold text-foreground mb-2 flex items-center gap-2">
+                      <Clock className="h-4 w-4 text-primary" />
+                      Schedule & Timing
+                    </h4>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="p-3 bg-muted/20 rounded border border-border/30">
+                        <p className="text-xs text-muted-foreground mb-1">Date</p>
+                        <p className="font-semibold text-foreground">{selectedFlight.date}</p>
+                      </div>
+                      <div className="p-3 bg-muted/20 rounded border border-border/30">
+                        <p className="text-xs text-muted-foreground mb-1">Duration</p>
+                        <p className="font-semibold text-foreground">{selectedFlight.duration}</p>
+                      </div>
+                      <div className="p-3 bg-muted/20 rounded border border-border/30">
+                        <p className="text-xs text-muted-foreground mb-1">Departure</p>
+                        <p className="font-semibold text-foreground">{selectedFlight.departureTime}</p>
+                      </div>
+                      <div className="p-3 bg-muted/20 rounded border border-border/30">
+                        <p className="text-xs text-muted-foreground mb-1">Arrival</p>
+                        <p className="font-semibold text-foreground">{selectedFlight.arrivalTime}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Flight Performance */}
+                  <div>
+                    <h4 className="font-semibold text-foreground mb-2 flex items-center gap-2">
+                      <Gauge className="h-4 w-4 text-primary" />
+                      Flight Performance
+                    </h4>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                      <div className="p-3 bg-muted/20 rounded border border-border/30">
+                        <p className="text-xs text-muted-foreground mb-1">Distance</p>
+                        <p className="font-semibold text-foreground">{selectedFlight.distance}</p>
+                      </div>
+                      <div className="p-3 bg-muted/20 rounded border border-border/30">
+                        <p className="text-xs text-muted-foreground mb-1">Max Altitude</p>
+                        <p className="font-semibold text-foreground">{selectedFlight.maxAltitude}</p>
+                      </div>
+                      <div className="p-3 bg-muted/20 rounded border border-border/30">
+                        <p className="text-xs text-muted-foreground mb-1">Avg Speed</p>
+                        <p className="font-semibold text-foreground">{selectedFlight.avgSpeed}</p>
+                      </div>
+                      <div className="p-3 bg-muted/20 rounded border border-border/30">
+                        <p className="text-xs text-muted-foreground mb-1">Fuel Used</p>
+                        <p className="font-semibold text-foreground">{selectedFlight.fuelUsed}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Crew & Passengers */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <h4 className="font-semibold text-foreground mb-2 flex items-center gap-2">
+                        <User className="h-4 w-4 text-primary" />
+                        Flight Crew
+                      </h4>
+                      <div className="space-y-2 p-3 bg-muted/20 rounded border border-border/30">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">Captain:</span>
+                          <span className="font-medium text-foreground">{selectedFlight.captain}</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">First Officer:</span>
+                          <span className="font-medium text-foreground">{selectedFlight.firstOfficer}</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">Total Crew:</span>
+                          <span className="font-medium text-foreground">{selectedFlight.crew} members</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <h4 className="font-semibold text-foreground mb-2 flex items-center gap-2">
+                        <Users className="h-4 w-4 text-primary" />
+                        Passengers & Cargo
+                      </h4>
+                      <div className="space-y-2 p-3 bg-muted/20 rounded border border-border/30">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">Passengers:</span>
+                          <span className="font-medium text-foreground">{selectedFlight.passengers} pax</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">Cargo Weight:</span>
+                          <span className="font-medium text-foreground">{selectedFlight.cargoWeight}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Weather & Conditions */}
+                  <div>
+                    <h4 className="font-semibold text-foreground mb-2 flex items-center gap-2">
+                      <CloudRain className="h-4 w-4 text-primary" />
+                      Weather & Conditions
+                    </h4>
+                    <p className="text-sm text-muted-foreground p-3 bg-muted/20 rounded border border-border/30">
+                      {selectedFlight.weather}
+                    </p>
+                  </div>
+
+                  {/* Delays */}
+                  {selectedFlight.delayReason && <div>
+                      <h4 className="font-semibold text-foreground mb-2 flex items-center gap-2">
+                        <AlertTriangle className="h-4 w-4 text-warning" />
+                        Delay Information
+                      </h4>
+                      <p className="text-sm text-muted-foreground p-3 bg-warning/10 rounded border border-warning/30">
+                        {selectedFlight.delayReason}
+                      </p>
+                    </div>}
+
+                  {/* Incidents */}
+                  <div>
+                    <h4 className="font-semibold text-foreground mb-2 flex items-center gap-2">
+                      <FileText className="h-4 w-4 text-primary" />
+                      Incidents & Reports
+                    </h4>
+                    <p className="text-sm text-muted-foreground p-3 bg-muted/20 rounded border border-border/30">
+                      {selectedFlight.incidents}
+                    </p>
+                  </div>
+
+                  {/* Remarks */}
+                  <div>
+                    <h4 className="font-semibold text-foreground mb-2 flex items-center gap-2">
+                      <ClipboardCheck className="h-4 w-4 text-primary" />
+                      Flight Remarks
+                    </h4>
+                    <p className="text-sm text-muted-foreground p-3 bg-muted/20 rounded border border-border/30">
+                      {selectedFlight.remarks}
+                    </p>
+                  </div>
+                </div>}
+            </DialogContent>
+          </Dialog>
 
           <TabsContent value="maintenance">
             <Card className="bg-card/40 backdrop-blur-md">
