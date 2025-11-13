@@ -130,7 +130,7 @@ const Fleet = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {fleetData.map((aircraft) => (
-            <Link key={aircraft.id} to={`/?aircraft=${aircraft.id}`}>
+            <Link key={aircraft.id} to={`/aircraft/${aircraft.id}`}>
               <Card className="overflow-hidden bg-card/60 backdrop-blur-sm border-border/50 hover:border-primary/50 transition-all cursor-pointer hover:shadow-lg">
                 <div className="relative h-48 overflow-hidden">
                   <img 
