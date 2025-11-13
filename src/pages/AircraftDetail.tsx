@@ -440,7 +440,10 @@ const maintenanceHistory = [
     findings: "All systems within normal parameters. Minor hydraulic fluid leak detected and repaired.",
     status: "Completed",
     signOffBy: "Chief Engineer Michael Brown",
-    certification: "EASA Part-145 Certified"
+    certification: "EASA Part-145 Certified",
+    blockchainHash: "0xa1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2",
+    blockNumber: "15,901,456",
+    timestamp: "2024-01-05 18:45:22 UTC"
   },
   { 
     id: "MX-002",
@@ -455,7 +458,10 @@ const maintenanceHistory = [
     findings: "Navigation sensor showing intermittent signal loss. Unit replaced with new certified part.",
     status: "Completed",
     signOffBy: "Senior Technician David Lee",
-    certification: "EASA Part-145 Certified"
+    certification: "EASA Part-145 Certified",
+    blockchainHash: "0xb2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3",
+    blockNumber: "15,678,234",
+    timestamp: "2023-12-10 14:30:15 UTC"
   },
   { 
     id: "MX-003",
@@ -470,7 +476,10 @@ const maintenanceHistory = [
     findings: "Software upgrade completed successfully. All post-update tests passed.",
     status: "Completed",
     signOffBy: "Avionics Specialist Robert Taylor",
-    certification: "OEM Authorized"
+    certification: "OEM Authorized",
+    blockchainHash: "0xc3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4",
+    blockNumber: "15,456,789",
+    timestamp: "2023-11-20 16:20:08 UTC"
   },
   { 
     id: "MX-004",
@@ -485,7 +494,10 @@ const maintenanceHistory = [
     findings: "Comprehensive inspection completed. Landing gear tires at 75% wear - replaced as preventive maintenance. All structural inspections passed.",
     status: "Completed",
     signOffBy: "Chief Engineer Michael Brown",
-    certification: "EASA Part-145 Certified"
+    certification: "EASA Part-145 Certified",
+    blockchainHash: "0xd4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5",
+    blockNumber: "15,234,567",
+    timestamp: "2023-10-17 20:15:45 UTC"
   },
 ];
 
@@ -830,8 +842,19 @@ const AircraftDetail = () => {
               {/* Recent Maintenance Log */}
               <Card className="bg-card/60 backdrop-blur-lg border-border/30">
                 <CardHeader>
-                  <CardTitle>Recent Maintenance Log</CardTitle>
-                  <CardDescription>Latest maintenance activities (Click for details)</CardDescription>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle className="flex items-center gap-2">
+                        <Shield className="h-4 w-4 text-green-500" />
+                        Recent Maintenance Log
+                      </CardTitle>
+                      <CardDescription>Latest maintenance activities (Click for details)</CardDescription>
+                    </div>
+                    <Badge variant="outline" className="gap-1.5 text-green-500 border-green-500 text-xs">
+                      <Lock className="h-2.5 w-2.5" />
+                      Secured
+                    </Badge>
+                  </div>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
@@ -845,6 +868,9 @@ const AircraftDetail = () => {
                           <div className="flex items-center gap-2">
                             <Wrench className="h-4 w-4 text-primary" />
                             <span className="font-semibold text-foreground text-sm">{entry.type}</span>
+                            <Badge variant="outline" className="text-[10px] gap-1 text-green-500 border-green-500/50 px-1.5 py-0">
+                              <Shield className="h-2 w-2" />
+                            </Badge>
                           </div>
                           <span className="text-xs text-muted-foreground">{entry.date}</span>
                         </div>
@@ -1014,8 +1040,19 @@ const AircraftDetail = () => {
           <TabsContent value="maintenance">
             <Card className="bg-card/40 backdrop-blur-md">
               <CardHeader>
-                <CardTitle>Maintenance History</CardTitle>
-                <CardDescription>Recent maintenance activities and checks (Click for details)</CardDescription>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      <Shield className="h-5 w-5 text-green-500" />
+                      Maintenance History
+                    </CardTitle>
+                    <CardDescription>Blockchain-secured maintenance activities and checks (Click for details)</CardDescription>
+                  </div>
+                  <Badge variant="outline" className="gap-2 text-green-500 border-green-500">
+                    <Lock className="h-3 w-3" />
+                    Blockchain Verified
+                  </Badge>
+                </div>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -1031,6 +1068,10 @@ const AircraftDetail = () => {
                             <Wrench className="h-4 w-4 text-primary" />
                             <span className="font-bold text-foreground">{entry.type}</span>
                             <Badge variant="outline" className="text-xs">{entry.id}</Badge>
+                            <Badge variant="outline" className="text-xs gap-1 text-green-500 border-green-500/50">
+                              <Shield className="h-2.5 w-2.5" />
+                              Secured
+                            </Badge>
                           </div>
                           <p className="text-sm text-muted-foreground">{entry.description}</p>
                         </div>
@@ -1043,6 +1084,21 @@ const AircraftDetail = () => {
                     </div>
                   ))}
                 </div>
+                
+                {/* Blockchain Security Notice */}
+                <div className="mt-6 p-4 bg-green-500/10 border border-green-500/30 rounded-lg">
+                  <div className="flex items-start gap-3">
+                    <Shield className="h-5 w-5 text-green-500 mt-0.5" />
+                    <div>
+                      <p className="text-sm font-semibold text-foreground mb-1">Blockchain Security Enabled</p>
+                      <p className="text-xs text-muted-foreground">
+                        All maintenance records are cryptographically secured on the blockchain, ensuring 
+                        complete traceability, immutability, and tamper-proof verification of all maintenance 
+                        activities performed on this aircraft.
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
@@ -1054,14 +1110,52 @@ const AircraftDetail = () => {
                 <DialogTitle className="text-2xl flex items-center gap-3">
                   <ClipboardCheck className="h-6 w-6 text-primary" />
                   Maintenance Log Details
+                  <Badge variant="outline" className="gap-1.5 text-green-500 border-green-500 ml-auto">
+                    <Shield className="h-3 w-3" />
+                    Blockchain Verified
+                  </Badge>
                 </DialogTitle>
                 <DialogDescription>
-                  Complete maintenance record and documentation
+                  Complete maintenance record and documentation • Secured on blockchain
                 </DialogDescription>
               </DialogHeader>
 
               {selectedMaintenance && (
                 <div className="space-y-6 mt-4">
+                  {/* Blockchain Verification Badge */}
+                  <div className="border-2 border-green-500/30 bg-green-500/10 p-4 rounded-lg">
+                    <div className="flex items-start gap-3 mb-4">
+                      <div className="p-2 bg-green-500/20 rounded-full">
+                        <Lock className="h-5 w-5 text-green-500" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-bold text-foreground flex items-center gap-2 mb-1">
+                          Blockchain Security Verification
+                          <CheckCircle className="h-4 w-4 text-green-500" />
+                        </h3>
+                        <p className="text-xs text-muted-foreground mb-3">
+                          This maintenance record has been cryptographically secured and verified on the blockchain. 
+                          The immutable record ensures complete traceability and authenticity of all maintenance activities.
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                      <div className="p-2 bg-background/50 rounded border border-border/30">
+                        <p className="text-muted-foreground mb-1">Blockchain Hash</p>
+                        <p className="font-mono text-foreground text-[10px] break-all">{selectedMaintenance.blockchainHash}</p>
+                      </div>
+                      <div className="p-2 bg-background/50 rounded border border-border/30">
+                        <p className="text-muted-foreground mb-1">Block Number</p>
+                        <p className="font-semibold text-foreground">{selectedMaintenance.blockNumber}</p>
+                      </div>
+                      <div className="p-2 bg-background/50 rounded border border-border/30">
+                        <p className="text-muted-foreground mb-1">Timestamp</p>
+                        <p className="font-semibold text-foreground">{selectedMaintenance.timestamp}</p>
+                      </div>
+                    </div>
+                  </div>
+
                   {/* Header Info */}
                   <div className="grid grid-cols-2 gap-4 p-4 bg-muted/30 rounded-lg border border-border/30">
                     <div>
