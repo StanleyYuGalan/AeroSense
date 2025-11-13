@@ -6,7 +6,6 @@ import { Plane, AlertTriangle, CheckCircle, Clock, TrendingUp, Wrench, BarChart3
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from "recharts";
-import FleetMap from "@/components/FleetMap";
 import a350Image from "@/assets/a350.jpg";
 import a380Image from "@/assets/a380.jpg";
 import boeing777_300Image from "@/assets/777-300er.jpeg";
@@ -259,28 +258,6 @@ const Fleet = () => {
           </TabsContent>
 
           <TabsContent value="analytics" className="space-y-8">
-        {/* Fleet Location Map */}
-        <Card className="bg-card/30 backdrop-blur-lg border-border/30">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Plane className="h-5 w-5 text-primary" />
-              Global Fleet Distribution
-            </CardTitle>
-            <CardDescription>Real-time aircraft locations across the globe</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <FleetMap 
-              aircraft={fleetData.map(a => ({
-                id: a.id,
-                model: a.model,
-                location: a.location,
-                status: a.status,
-                coordinates: [0, 0] as [number, number]
-              }))}
-            />
-          </CardContent>
-        </Card>
-
         {/* Key Metrics Dashboard */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <Card className="bg-card/30 backdrop-blur-lg border-border/30">
