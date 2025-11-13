@@ -663,29 +663,70 @@ const AircraftDetail = () => {
         </Link>
 
         {/* Hero Section */}
-        <div className="relative h-64 rounded-lg overflow-hidden mb-8 shadow-xl">
-          <img
-            src={aircraft.image} 
-            alt={`${aircraft.model} - ${aircraft.id}`}
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/50 to-transparent" />
-          <div className="absolute bottom-0 left-0 right-0 p-8">
-            <div className="flex items-start justify-between">
-              <div>
-                <div className="flex items-center gap-3 mb-2">
-                  <Plane className="h-8 w-8 text-primary" />
-                  <h1 className="text-4xl font-bold text-foreground">{aircraft.id}</h1>
-                  <Badge className={getStatusColor(aircraft.status)}>{aircraft.status}</Badge>
-                </div>
-                <p className="text-xl text-foreground/90">{aircraft.model}</p>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          {/* Aircraft Image */}
+          <div className="relative h-80 rounded-lg overflow-hidden shadow-xl">
+            <img 
+              src={aircraft.image} 
+              alt={`${aircraft.model} - ${aircraft.id}`}
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent" />
+          </div>
+
+          {/* Aircraft Info */}
+          <div className="flex flex-col justify-center space-y-6 p-6 bg-card/40 backdrop-blur-lg border border-border/30 rounded-lg">
+            <div>
+              <div className="flex items-center gap-3 mb-2">
+                <Plane className="h-8 w-8 text-primary" />
+                <h1 className="text-4xl font-bold text-foreground">{aircraft.id}</h1>
+                <Badge className={getStatusColor(aircraft.status)}>{aircraft.status}</Badge>
               </div>
-              {aircraft.warnings > 0 && (
-                <Badge variant="outline" className="text-warning border-warning">
-                  {aircraft.warnings} Active Warning{aircraft.warnings > 1 ? "s" : ""}
-                </Badge>
-              )}
+              <p className="text-xl text-foreground/90">{aircraft.model}</p>
             </div>
+
+            {/* Quick Stats Grid */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="p-3 bg-background/50 rounded-lg border border-border/30">
+                <div className="flex items-center gap-2 mb-1">
+                  <MapPin className="h-4 w-4 text-primary" />
+                  <p className="text-xs text-muted-foreground">Location</p>
+                </div>
+                <p className="text-sm font-semibold text-foreground">{aircraft.location}</p>
+              </div>
+
+              <div className="p-3 bg-background/50 rounded-lg border border-border/30">
+                <div className="flex items-center gap-2 mb-1">
+                  <Clock className="h-4 w-4 text-primary" />
+                  <p className="text-xs text-muted-foreground">Flight Hours</p>
+                </div>
+                <p className="text-sm font-semibold text-foreground">{aircraft.flightHours.toLocaleString()}</p>
+              </div>
+
+              <div className="p-3 bg-background/50 rounded-lg border border-border/30">
+                <div className="flex items-center gap-2 mb-1">
+                  <Wrench className="h-4 w-4 text-primary" />
+                  <p className="text-xs text-muted-foreground">Next Maintenance</p>
+                </div>
+                <p className="text-sm font-semibold text-foreground">{aircraft.nextMaintenance}</p>
+              </div>
+
+              <div className="p-3 bg-background/50 rounded-lg border border-border/30">
+                <div className="flex items-center gap-2 mb-1">
+                  <Calendar className="h-4 w-4 text-primary" />
+                  <p className="text-xs text-muted-foreground">Total Cycles</p>
+                </div>
+                <p className="text-sm font-semibold text-foreground">{aircraft.cycles.toLocaleString()}</p>
+              </div>
+            </div>
+
+            {/* Warnings */}
+            {aircraft.warnings > 0 && (
+              <Badge variant="outline" className="text-warning border-warning w-fit">
+                <AlertTriangle className="h-3 w-3 mr-1" />
+                {aircraft.warnings} Active Warning{aircraft.warnings > 1 ? "s" : ""}
+              </Badge>
+            )}
           </div>
         </div>
 
