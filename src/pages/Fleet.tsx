@@ -196,46 +196,50 @@ const Fleet = () => {
 
         {/* Active Warnings Section */}
         {aircraftWithWarnings.length > 0 && (
-          <div className="mb-8">
-            <div className="flex items-center gap-2 mb-4">
-              <AlertTriangle className="h-6 w-6 text-warning" />
-              <h3 className="text-2xl font-bold text-foreground">Active Warnings</h3>
-              <Badge variant="destructive" className="ml-2">
-                {totalWarnings} Total
-              </Badge>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-              {aircraftWithWarnings.map((aircraft) => (
-                <Link key={aircraft.id} to={`/aircraft/${aircraft.id}`}>
-                  <Card interactive className="bg-destructive/10 backdrop-blur-lg border-warning/50 hover:border-warning transition-all cursor-pointer hover:shadow-lg hover:shadow-warning/20">
-                    <CardContent className="p-4">
-                      <div className="flex items-start gap-3">
-                        <div className="p-2 bg-warning/20 rounded-lg">
-                          <AlertTriangle className="h-5 w-5 text-warning" />
+          <Card className="mb-8 bg-destructive/10 backdrop-blur-lg border-warning/50">
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="h-6 w-6 text-warning" />
+                <CardTitle className="text-2xl">Active Warnings</CardTitle>
+                <Badge variant="destructive" className="ml-2">
+                  {totalWarnings} Total
+                </Badge>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                {aircraftWithWarnings.map((aircraft) => (
+                  <Link key={aircraft.id} to={`/aircraft/${aircraft.id}`}>
+                    <div className="flex items-center gap-4 p-4 bg-card/40 backdrop-blur-sm border border-border/30 rounded-lg hover:border-warning/50 hover:bg-warning/5 transition-all cursor-pointer group">
+                      <div className="flex items-center justify-center w-10 h-10 bg-warning/20 rounded-lg group-hover:bg-warning/30 transition-colors">
+                        <AlertTriangle className="h-5 w-5 text-warning" />
+                      </div>
+                      
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <h4 className="font-bold text-foreground">{aircraft.id}</h4>
+                          <Badge variant="outline" className="text-warning border-warning">
+                            {aircraft.warnings} Warning{aircraft.warnings > 1 ? "s" : ""}
+                          </Badge>
                         </div>
-                        <div className="flex-1">
-                          <div className="flex items-center justify-between mb-2">
-                            <h4 className="font-bold text-foreground">{aircraft.id}</h4>
-                            <Badge variant="outline" className="text-warning border-warning">
-                              {aircraft.warnings} Warning{aircraft.warnings > 1 ? "s" : ""}
-                            </Badge>
-                          </div>
-                          <p className="text-sm text-foreground font-medium">{aircraft.model}</p>
-                          <p className="text-xs text-muted-foreground mt-1">{aircraft.location}</p>
-                          <div className="mt-3 flex items-center gap-2">
-                            {getStatusBadge(aircraft.status)}
-                            <span className="text-xs text-muted-foreground">
-                              {aircraft.flightHours.toLocaleString()} hrs
-                            </span>
-                          </div>
+                        <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                          <span className="font-medium text-foreground">{aircraft.model}</span>
+                          <span>•</span>
+                          <span>{aircraft.location}</span>
+                          <span>•</span>
+                          <span>{aircraft.flightHours.toLocaleString()} hrs</span>
                         </div>
                       </div>
-                    </CardContent>
-                  </Card>
-                </Link>
-              ))}
-            </div>
-          </div>
+                      
+                      <div>
+                        {getStatusBadge(aircraft.status)}
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         )}
 
         <Tabs defaultValue="aircraft" className="space-y-6">
