@@ -663,8 +663,8 @@ const AircraftDetail = () => {
         </Link>
 
         {/* Hero Section */}
-        <div className="relative h-96 rounded-lg overflow-hidden mb-8 shadow-xl">
-          <img 
+        <div className="relative h-64 rounded-lg overflow-hidden mb-8 shadow-xl">
+          <img
             src={aircraft.image} 
             alt={`${aircraft.model} - ${aircraft.id}`}
             className="w-full h-full object-cover"
