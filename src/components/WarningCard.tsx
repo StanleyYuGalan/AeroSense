@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { AlertTriangle, FileText, Bell, Wrench, Info } from "lucide-react";
 import { MonitoringCharts } from "./MonitoringCharts";
 import { useToast } from "@/hooks/use-toast";
+import { motion } from "framer-motion";
 
 export const WarningCard = () => {
   const { toast } = useToast();
@@ -34,9 +35,20 @@ export const WarningCard = () => {
   return (
     <Card className="p-6 bg-card/60 backdrop-blur-sm border-warning/30 shadow-lg">
       <div className="flex items-center gap-3 mb-6">
-        <div className="bg-warning rounded-full p-3 animate-pulse-glow">
+        <motion.div 
+          className="bg-warning rounded-full p-3"
+          animate={{ 
+            scale: [1, 1.1, 1],
+            rotate: [0, 5, -5, 0]
+          }}
+          transition={{ 
+            duration: 2,
+            repeat: Infinity,
+            repeatType: "reverse"
+          }}
+        >
           <AlertTriangle className="h-8 w-8 text-warning-foreground" />
-        </div>
+        </motion.div>
         <h2 className="text-2xl font-bold text-foreground">
           Engine Warning: Abnormal Exhaust Temperature and Vibrations
         </h2>

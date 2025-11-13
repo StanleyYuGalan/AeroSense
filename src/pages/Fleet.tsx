@@ -206,7 +206,7 @@ const Fleet = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
               {fleetData.map((aircraft) => (
                 <Link key={aircraft.id} to={`/aircraft/${aircraft.id}`}>
-                  <Card className="overflow-hidden bg-card/30 backdrop-blur-lg border-border/30 hover:border-primary/50 transition-all cursor-pointer hover:shadow-lg h-full">
+                  <Card interactive className="overflow-hidden bg-card/30 backdrop-blur-lg border-border/30 hover:border-primary/50 transition-all cursor-pointer hover:shadow-lg h-full">
                     <div className="relative h-40 overflow-hidden">
                       <img 
                         src={aircraft.image} 

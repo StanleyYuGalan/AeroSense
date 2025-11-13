@@ -1,10 +1,28 @@
-import * as React from "react";
+import * as React from "react"
+import { motion } from "framer-motion"
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils"
 
-const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(({ className, ...props }, ref) => (
-  <div ref={ref} className={cn("rounded-lg border border-border/30 bg-card/40 backdrop-blur-md text-card-foreground shadow-lg", className)} {...props} />
-));
+const Card = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement> & { interactive?: boolean }
+>(({ className, interactive = false, onAnimationStart, ...props }, ref) => {
+  if (interactive) {
+    return (
+      <motion.div 
+        ref={ref} 
+        className={cn("rounded-lg border border-border/30 bg-card/40 backdrop-blur-md text-card-foreground shadow-lg", className)} 
+        whileHover={{ y: -4, scale: 1.02 }}
+        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+        {...(props as any)} 
+      />
+    );
+  }
+  
+  return (
+    <div ref={ref} className={cn("rounded-lg border border-border/30 bg-card/40 backdrop-blur-md text-card-foreground shadow-lg", className)} {...props} />
+  );
+});
 Card.displayName = "Card";
 
 const CardHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(

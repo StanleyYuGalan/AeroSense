@@ -1,5 +1,6 @@
 import { useParams, Link } from "react-router-dom";
 import { useState } from "react";
+import { motion } from "framer-motion";
 import { Header } from "@/components/Header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -1015,7 +1016,8 @@ const AircraftDetail = () => {
             </AlertTitle>
             <AlertDescription>
               <div className="space-y-4">
-                {aircraft.warningDetails.map((warning: any) => <Card 
+                {aircraft.warningDetails.map((warning: any, index: number) => <Card 
+                    interactive
                     key={warning.id} 
                     className="border-warning/30 bg-background/60 backdrop-blur-md cursor-pointer hover:border-warning/50 hover:bg-background/70 transition-all"
                     onClick={() => setSelectedWarning(warning)}

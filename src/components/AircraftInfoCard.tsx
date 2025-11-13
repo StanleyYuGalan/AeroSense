@@ -1,5 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { motion } from "framer-motion";
 import aircraftImage from "@/assets/aircraft.jpg";
 
 export const AircraftInfoCard = () => {
@@ -24,13 +25,17 @@ export const AircraftInfoCard = () => {
             <Badge className="bg-primary text-primary-foreground">Compliant</Badge>
           </div>
         </div>
-        <div className="flex items-center justify-center">
+        <motion.div 
+          className="flex items-center justify-center"
+          whileHover={{ scale: 1.05 }}
+          transition={{ type: "spring", stiffness: 300, damping: 20 }}
+        >
           <img 
             src={aircraftImage} 
             alt="Emirates A350-900 Aircraft" 
             className="w-full h-auto rounded-lg shadow-md"
           />
-        </div>
+        </motion.div>
       </div>
     </Card>
   );
