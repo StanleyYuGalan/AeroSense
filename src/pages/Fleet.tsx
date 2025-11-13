@@ -181,7 +181,7 @@ const Fleet = () => {
   });
 
   return (
-    <div className="min-h-screen bg-background bg-cover bg-center bg-fixed" style={{ backgroundImage: 'url(/images/tech-background.jpeg)' }}>
+    <div className="min-h-screen bg-background bg-cover bg-center bg-fixed" style={{ backgroundImage: 'url(/images/background.jpeg)' }}>
       <div className="min-h-screen bg-background/50">
         <Header />
       

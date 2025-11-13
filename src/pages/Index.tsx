@@ -9,7 +9,7 @@ const Index = () => {
   const [selectedEntryId, setSelectedEntryId] = useState<string>("0");
 
   return (
-    <div className="min-h-screen bg-background bg-cover bg-center bg-fixed" style={{ backgroundImage: 'url(/images/tech-background.jpeg)' }}>
+    <div className="min-h-screen bg-background bg-cover bg-center bg-fixed" style={{ backgroundImage: 'url(/images/background.jpeg)' }}>
       <div className="min-h-screen bg-background/50">
         <Header />
 
