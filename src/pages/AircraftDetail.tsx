@@ -1963,7 +1963,9 @@ const AircraftDetail = () => {
                       onClick={async () => {
                         setGeneratingReport(true);
                         try {
-                          const reportPrompt = `Generate a comprehensive aircraft status report for ${aircraft.id} (${aircraft.model}). Include executive summary, current operational status, system health analysis, maintenance status and recommendations, flight history insights, and any warnings or concerns. Use the following data: ${JSON.stringify({
+                          const reportPrompt = `Generate a comprehensive aircraft status report for ${aircraft.id} (${aircraft.model}). 
+                          
+                          Aircraft Data: ${JSON.stringify({
                             aircraft: {
                               id: aircraft.id,
                               model: aircraft.model,
@@ -1978,7 +1980,32 @@ const AircraftDetail = () => {
                               warnings: aircraft.warnings,
                               warningDetails: aircraft.warningDetails
                             }
-                          })}. Format the report professionally with clear sections and actionable insights.`;
+                          })}
+                          
+                          Format your response with the following structure using markdown headers:
+                          
+                          # Executive Summary
+                          [Brief overview of aircraft status and key findings]
+                          
+                          # Current Operational Status
+                          [Detailed operational status information]
+                          
+                          # System Health Analysis
+                          [Analysis of system health and performance]
+                          
+                          # Maintenance Status & Recommendations
+                          [Current maintenance status and future recommendations]
+                          
+                          # Active Warnings & Concerns
+                          [Detail any warnings or areas of concern]
+                          
+                          # Flight History Insights
+                          [Analysis based on flight hours and cycles]
+                          
+                          # Recommendations
+                          [Actionable recommendations for maintenance and operations]
+                          
+                          Keep each section concise and actionable.`;
 
                           const response = await fetch(CHAT_URL, {
                             method: "POST",
@@ -2014,27 +2041,26 @@ const AircraftDetail = () => {
 
                             let newlineIndex: number;
                             while ((newlineIndex = textBuffer.indexOf("\n")) !== -1) {
-                              let line = textBuffer.slice(0, newlineIndex);
+                              const line = textBuffer.slice(0, newlineIndex);
                               textBuffer = textBuffer.slice(newlineIndex + 1);
 
-                              if (line.endsWith("\r")) line = line.slice(0, -1);
-                              if (line.startsWith(":") || line.trim() === "") continue;
-                              if (!line.startsWith("data: ")) continue;
-
-                              const jsonStr = line.slice(6).trim();
-                              if (jsonStr === "[DONE]") {
-                                streamDone = true;
-                                break;
-                              }
-
-                              try {
-                                const parsed = JSON.parse(jsonStr);
-                                const content = parsed.choices?.[0]?.delta?.content as string | undefined;
-                                if (content) {
-                                  reportSoFar += content;
-                                  setGeneratedReport(reportSoFar);
+                              if (line.startsWith("data: ")) {
+                                const jsonData = line.slice(6);
+                                if (jsonData === "[DONE]") {
+                                  streamDone = true;
+                                  break;
                                 }
-                              } catch {
+                                try {
+                                  const parsed = JSON.parse(jsonData);
+                                  const content = parsed.choices?.[0]?.delta?.content;
+                                  if (content) {
+                                    reportSoFar += content;
+                                    setGeneratedReport(reportSoFar);
+                                  }
+                                } catch (e) {
+                                  console.error("Error parsing JSON:", e);
+                                }
+                              } else if (line.length > 0) {
                                 textBuffer = line + "\n" + textBuffer;
                                 break;
                               }
@@ -2093,8 +2119,50 @@ const AircraftDetail = () => {
                         Download Report
                       </Button>
                     </div>
-                    <div className="prose prose-sm max-w-none bg-background/50 p-6 rounded-lg border whitespace-pre-wrap">
-                      {generatedReport}
+                    
+                    {/* Parse and display report in structured format */}
+                    <div className="space-y-3">
+                      {generatedReport.split(/(?=^# )/gm).filter(section => section.trim()).map((section, idx) => {
+                        const lines = section.trim().split('\n');
+                        const title = lines[0].replace(/^# /, '');
+                        const content = lines.slice(1).join('\n').trim();
+                        
+                        // Determine icon and color based on section title
+                        let icon = <FileText className="h-5 w-5" />;
+                        let variant: "default" | "destructive" = "default";
+                        
+                        if (title.toLowerCase().includes('warning') || title.toLowerCase().includes('concern')) {
+                          icon = <AlertTriangle className="h-5 w-5 text-warning" />;
+                          variant = "destructive";
+                        } else if (title.toLowerCase().includes('status')) {
+                          icon = <Gauge className="h-5 w-5 text-primary" />;
+                        } else if (title.toLowerCase().includes('maintenance')) {
+                          icon = <Wrench className="h-5 w-5 text-primary" />;
+                        } else if (title.toLowerCase().includes('recommendation')) {
+                          icon = <CheckCircle className="h-5 w-5 text-green-500" />;
+                        } else if (title.toLowerCase().includes('summary')) {
+                          icon = <Info className="h-5 w-5 text-blue-500" />;
+                        }
+                        
+                        return (
+                          <Card 
+                            key={idx} 
+                            className={`border ${variant === "destructive" ? "border-warning/30 bg-warning/5" : "border-border/30 bg-card/40"} backdrop-blur-sm`}
+                          >
+                            <CardHeader className="pb-3">
+                              <CardTitle className="text-lg flex items-center gap-2">
+                                {icon}
+                                {title}
+                              </CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                              <div className="text-sm text-foreground whitespace-pre-wrap leading-relaxed">
+                                {content}
+                              </div>
+                            </CardContent>
+                          </Card>
+                        );
+                      })}
                     </div>
                   </div>
                 )}
