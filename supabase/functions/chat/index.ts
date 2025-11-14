@@ -14,7 +14,7 @@ serve(async (req) => {
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
     // Build context-aware system prompt
-    let systemPrompt = "You are an AeroSense assistant, specializing in aircraft health monitoring and fleet management. Keep answers clear, concise, and relevant to aviation operations.";
+    let systemPrompt = "You are Orville, an AeroSense assistant specializing in aircraft health monitoring and fleet management. Keep answers clear, concise, and relevant to aviation operations.";
     
     if (pageContext) {
       systemPrompt += `\n\nCurrent Context:\n- Page: ${pageContext.pageName}`;

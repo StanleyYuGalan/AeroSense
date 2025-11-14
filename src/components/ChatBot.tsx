@@ -4,7 +4,9 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { MessageCircle, X, Send } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { toast } from "sonner";
+import orvilleAvatar from "@/assets/orville-avatar.png";
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`;
 
@@ -25,7 +27,7 @@ export const ChatBot = ({ pageContext }: ChatBotProps = {}) => {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content: "Hello! I'm your AeroSense assistant. How can I help you today?",
+      content: "Hello! I'm Orville, your AeroSense assistant. How can I help you today?",
     },
   ]);
   const [input, setInput] = useState("");
@@ -167,9 +169,12 @@ export const ChatBot = ({ pageContext }: ChatBotProps = {}) => {
       {isOpen && (
         <Card className="fixed bottom-6 right-6 w-96 h-[500px] flex flex-col shadow-2xl z-50 border-2">
           <div className="flex items-center justify-between p-4 border-b bg-primary text-primary-foreground rounded-t-lg">
-            <div className="flex items-center gap-2">
-              <MessageCircle className="h-5 w-5" />
-              <h3 className="font-semibold">AeroSense Assistant</h3>
+            <div className="flex items-center gap-3">
+              <Avatar className="h-8 w-8">
+                <AvatarImage src={orvilleAvatar} alt="Orville" />
+                <AvatarFallback>OR</AvatarFallback>
+              </Avatar>
+              <h3 className="font-semibold">Orville</h3>
             </div>
             <Button
               variant="ghost"
