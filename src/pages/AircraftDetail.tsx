@@ -1,5 +1,5 @@
-import { useParams, Link } from "react-router-dom";
-import { useState } from "react";
+import { useParams, Link, useSearchParams } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Header } from "@/components/Header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -845,6 +845,7 @@ const AircraftDetail = () => {
   } = useParams<{
     id: string;
   }>();
+  const [searchParams, setSearchParams] = useSearchParams();
   const aircraft = id ? aircraftDatabase[id] : null;
   const [selectedMaintenance, setSelectedMaintenance] = useState<typeof maintenanceHistory[0] | null>(null);
   const [selectedDocument, setSelectedDocument] = useState<any>(null);
@@ -852,6 +853,19 @@ const AircraftDetail = () => {
   const [selectedWarning, setSelectedWarning] = useState<any>(null);
   const [generatingReport, setGeneratingReport] = useState(false);
   const [generatedReport, setGeneratedReport] = useState<string>("");
+
+  // Auto-open warning modal from URL parameter
+  useEffect(() => {
+    const warningId = searchParams.get('warningId');
+    if (warningId && aircraft?.warningDetails) {
+      const warning = aircraft.warningDetails.find((w: any) => w.id === warningId);
+      if (warning) {
+        setSelectedWarning(warning);
+        // Clear the parameter after opening
+        setSearchParams({}, { replace: true });
+      }
+    }
+  }, [searchParams, aircraft, setSearchParams]);
   const aircraftDocuments = [{
     name: "Airworthiness Certificate",
     date: "Valid until 2025-12-31",

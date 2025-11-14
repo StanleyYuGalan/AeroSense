@@ -75,6 +75,7 @@ const fleetData = [
     nextMaintenance: "In Progress",
     flightHours: 9150,
     warnings: 2,
+    warningIds: ["WARN-001", "WARN-002"],
     image: a350Image,
   },
   {
@@ -95,6 +96,7 @@ const fleetData = [
     nextMaintenance: "2024-02-01",
     flightHours: 15200,
     warnings: 1,
+    warningIds: ["WARN-003"],
     image: boeing777_300Image,
   },
   {
@@ -135,6 +137,7 @@ const fleetData = [
     nextMaintenance: "2024-01-17",
     flightHours: 16100,
     warnings: 1,
+    warningIds: ["WARN-004"],
     image: boeing777_300Image,
   },
 ];
@@ -230,7 +233,7 @@ const Fleet = () => {
             <CardContent>
               <div className="space-y-2">
                 {aircraftWithWarnings.map((aircraft) => (
-                  <Link key={aircraft.id} to={`/aircraft/${aircraft.id}`}>
+                  <Link key={aircraft.id} to={`/aircraft/${aircraft.id}${(aircraft as any).warningIds?.[0] ? `?warningId=${(aircraft as any).warningIds[0]}` : ''}`}>
                     <div className="flex items-center gap-4 p-4 bg-destructive/10 backdrop-blur-sm border border-destructive/40 rounded-lg hover:border-destructive/60 hover:bg-destructive/20 transition-all cursor-pointer group">
                       <div className="flex items-center justify-center w-10 h-10 bg-destructive/30 rounded-lg group-hover:bg-destructive/40 transition-colors">
                         <AlertTriangle className="h-5 w-5 text-warning" />
