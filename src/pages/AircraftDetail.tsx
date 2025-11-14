@@ -1029,48 +1029,36 @@ const AircraftDetail = () => {
         </div>
 
         {/* Warning Messages - Front and Center */}
-        {aircraft.warnings > 0 && aircraft.warningDetails && <Alert variant="destructive" className="mb-8 border-2 border-warning/30 bg-warning/10 backdrop-blur-md backdrop-saturate-150">
-            <AlertTriangle className="h-6 w-6" />
-            <AlertTitle className="text-xl font-bold mb-4">
-              {aircraft.warnings} Active Warning{aircraft.warnings > 1 ? "s" : ""} - Immediate Attention Required
+        {aircraft.warnings > 0 && aircraft.warningDetails && <Alert variant="destructive" className="mb-6 border border-warning/30 bg-warning/10 backdrop-blur-md backdrop-saturate-150">
+            <AlertTriangle className="h-5 w-5" />
+            <AlertTitle className="text-lg font-bold mb-3">
+              {aircraft.warnings} Active Warning{aircraft.warnings > 1 ? "s" : ""}
             </AlertTitle>
             <AlertDescription>
-              <div className="space-y-4">
+              <div className="space-y-2">
                 {aircraft.warningDetails.map((warning: any, index: number) => <Card 
                     interactive
                     key={warning.id} 
                     className="border-warning/30 bg-background/60 backdrop-blur-md cursor-pointer hover:border-warning/50 hover:bg-background/70 transition-all"
                     onClick={() => setSelectedWarning(warning)}
                   >
-                    <CardContent className="p-4">
-                      <div className="flex items-start justify-between mb-3">
-                        <div className="flex items-start gap-3">
+                    <CardContent className="p-3">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2 flex-1">
                           {getSeverityIcon(warning.severity)}
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
-                              <h4 className="font-bold text-foreground text-lg">{warning.system}</h4>
-                              <Badge variant={getSeverityColor(warning.severity) as any} className="uppercase text-xs">
-                                {warning.severity} Priority
-                              </Badge>
-                            </div>
-                            <p className="text-sm text-muted-foreground mb-2">ID: {warning.id}</p>
-                          </div>
+                          <h4 className="font-semibold text-foreground text-sm">{warning.system}</h4>
+                          <Badge variant={getSeverityColor(warning.severity) as any} className="uppercase text-xs">
+                            {warning.severity}
+                          </Badge>
+                          <span className="text-xs text-muted-foreground">•</span>
+                          <span className="text-xs text-muted-foreground">{warning.id}</span>
                         </div>
-                        <Badge variant="outline" className="ml-2">{warning.status}</Badge>
+                        <Badge variant="outline" className="text-xs">{warning.status}</Badge>
                       </div>
-                      <div className="space-y-2 pl-8">
-                        <div>
-                          <p className="text-sm font-medium text-foreground mb-1">Description:</p>
-                          <p className="text-sm text-muted-foreground">{warning.description}</p>
-                        </div>
-                        <div>
-                          <p className="text-sm font-medium text-foreground mb-1">Required Action:</p>
-                          <p className="text-sm text-muted-foreground">{warning.action}</p>
-                        </div>
-                        <div className="pt-2 border-t border-border/50 flex items-center justify-between">
-                          <p className="text-xs text-muted-foreground">Detected: {warning.detectedDate}</p>
-                          <p className="text-xs text-primary">Click for details →</p>
-                        </div>
+                      <p className="text-xs text-muted-foreground mb-2 line-clamp-2">{warning.description}</p>
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-muted-foreground">{warning.detectedDate}</span>
+                        <span className="text-primary">View details →</span>
                       </div>
                     </CardContent>
                   </Card>)}
@@ -1181,35 +1169,26 @@ const AircraftDetail = () => {
                   <CardDescription>Real-time alerts and system anomalies</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  {aircraft.warnings > 0 && aircraft.warningDetails ? <div className="space-y-4">
-                      {aircraft.warningDetails.map((warning: any) => <div key={warning.id} className="p-4 border-2 border-warning/30 rounded-lg bg-warning/5">
-                          <div className="flex items-start justify-between mb-3">
-                            <div className="flex items-start gap-3">
+                  {aircraft.warnings > 0 && aircraft.warningDetails ? <div className="space-y-2">
+                      {aircraft.warningDetails.map((warning: any) => <div 
+                          key={warning.id} 
+                          className="p-3 border border-warning/30 rounded-lg bg-warning/5 cursor-pointer hover:bg-warning/10 transition-colors"
+                          onClick={() => setSelectedWarning(warning)}
+                        >
+                          <div className="flex items-center justify-between mb-1">
+                            <div className="flex items-center gap-2 flex-1">
                               {getSeverityIcon(warning.severity)}
-                              <div className="flex-1">
-                                <div className="flex items-center gap-2 mb-1">
-                                  <h4 className="font-bold text-foreground">{warning.system}</h4>
-                                  <Badge variant={getSeverityColor(warning.severity) as any} className="uppercase text-xs">
-                                    {warning.severity}
-                                  </Badge>
-                                </div>
-                                <p className="text-xs text-muted-foreground">Warning ID: {warning.id}</p>
-                              </div>
+                              <h4 className="font-semibold text-foreground text-sm">{warning.system}</h4>
+                              <Badge variant={getSeverityColor(warning.severity) as any} className="uppercase text-xs">
+                                {warning.severity}
+                              </Badge>
                             </div>
-                            <Badge variant="outline">{warning.status}</Badge>
+                            <Badge variant="outline" className="text-xs">{warning.status}</Badge>
                           </div>
-                          <div className="space-y-2 pl-8">
-                            <div>
-                              <p className="text-xs font-semibold text-foreground mb-1">Issue Description:</p>
-                              <p className="text-sm text-muted-foreground">{warning.description}</p>
-                            </div>
-                            <div>
-                              <p className="text-xs font-semibold text-foreground mb-1">Required Action:</p>
-                              <p className="text-sm text-warning">{warning.action}</p>
-                            </div>
-                            <div className="pt-2 border-t border-border/30">
-                              <p className="text-xs text-muted-foreground">Detected: {warning.detectedDate}</p>
-                            </div>
+                          <p className="text-xs text-muted-foreground mb-1 pl-6 line-clamp-1">{warning.description}</p>
+                          <div className="flex items-center justify-between text-xs pl-6">
+                            <span className="text-muted-foreground">{warning.detectedDate}</span>
+                            <span className="text-primary">Click for details →</span>
                           </div>
                         </div>)}
                     </div> : <div className="text-center py-8">
