@@ -14,12 +14,17 @@ serve(async (req) => {
   try {
     const { action, query, modelEndpoint, inputData } = await req.json();
     
-    const DATABRICKS_HOST = Deno.env.get('DATABRICKS_HOST');
+    let DATABRICKS_HOST = Deno.env.get('DATABRICKS_HOST');
     const DATABRICKS_TOKEN = Deno.env.get('DATABRICKS_TOKEN');
     const DATABRICKS_SQL_WAREHOUSE_ID = Deno.env.get('DATABRICKS_SQL_WAREHOUSE_ID');
 
     if (!DATABRICKS_HOST || !DATABRICKS_TOKEN) {
       throw new Error('Databricks credentials not configured');
+    }
+
+    // Ensure DATABRICKS_HOST has https:// protocol
+    if (!DATABRICKS_HOST.startsWith('http://') && !DATABRICKS_HOST.startsWith('https://')) {
+      DATABRICKS_HOST = `https://${DATABRICKS_HOST}`;
     }
 
     console.log(`Databricks action: ${action}`);
