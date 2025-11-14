@@ -1,12 +1,15 @@
 import { Header } from "@/components/Header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Plane, AlertTriangle, CheckCircle, Clock, TrendingUp, Wrench, BarChart3 } from "lucide-react";
+import { Plane, AlertTriangle, CheckCircle, Clock, TrendingUp, Wrench, BarChart3, Database, Loader2 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from "recharts";
 import { ChatBot } from "@/components/ChatBot";
+import { useState } from "react";
+import { toast } from "sonner";
 import a350Image from "@/assets/a350.jpg";
 import a380Image from "@/assets/a380.jpg";
 import boeing777_300Image from "@/assets/777-300er.jpeg";
@@ -165,6 +168,118 @@ const getStatusBadge = (status: string) => {
     <Badge variant={variants[status] || "outline"} className="capitalize">
       {status}
     </Badge>
+  );
+};
+
+const DatabricksQuerySection = () => {
+  const [queryResult, setQueryResult] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+  const DATABRICKS_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/databricks`;
+
+  const handleTestQuery = async () => {
+    setLoading(true);
+    setQueryResult(null);
+    
+    try {
+      // Test query to get sample aircraft maintenance data
+      const testQuery = "SELECT aircraft_id, maintenance_type, scheduled_date, status FROM aircraft_maintenance WHERE status = 'scheduled' LIMIT 5";
+      
+      const response = await fetch(DATABRICKS_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify({
+          action: "query",
+          query: testQuery,
+        }),
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        setQueryResult(result.data);
+        toast.success("Databricks query executed successfully!");
+      } else {
+        toast.error(`Query failed: ${result.error}`);
+        setQueryResult({ error: result.error });
+      }
+    } catch (error) {
+      console.error("Query error:", error);
+      toast.error("Failed to execute Databricks query");
+      setQueryResult({ error: error instanceof Error ? error.message : "Unknown error" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="space-y-2">
+        <h4 className="text-sm font-medium text-foreground flex items-center gap-2">
+          <Database className="h-4 w-4" />
+          Databricks Connection Test
+        </h4>
+        <p className="text-xs text-muted-foreground">
+          Query live maintenance data from your Databricks SQL Warehouse
+        </p>
+      </div>
+
+      <div className="flex gap-2">
+        <Button onClick={handleTestQuery} disabled={loading} size="sm">
+          {loading ? (
+            <>
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              Querying...
+            </>
+          ) : (
+            <>
+              <Database className="h-4 w-4 mr-2" />
+              Run Test Query
+            </>
+          )}
+        </Button>
+      </div>
+
+      {queryResult && (
+        <Card className="bg-background/50 border-border/30">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm">Query Results</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {queryResult.error ? (
+              <div className="text-destructive text-xs">
+                <p className="font-semibold mb-1">Error:</p>
+                <p>{queryResult.error}</p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
+                  <span>Status: {queryResult.status?.state || "completed"}</span>
+                  {queryResult.manifest?.total_row_count !== undefined && (
+                    <span>Rows: {queryResult.manifest.total_row_count}</span>
+                  )}
+                </div>
+                <pre className="text-xs overflow-auto max-h-[300px] p-3 bg-muted/30 rounded border">
+                  {JSON.stringify(queryResult, null, 2)}
+                </pre>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      <div className="p-3 bg-primary/5 border border-primary/20 rounded-lg text-xs">
+        <p className="text-foreground mb-1 font-semibold">Test Query:</p>
+        <code className="text-muted-foreground">
+          SELECT aircraft_id, maintenance_type, scheduled_date, status 
+          FROM aircraft_maintenance 
+          WHERE status = 'scheduled' 
+          LIMIT 5
+        </code>
+      </div>
+    </div>
   );
 };
 
@@ -406,10 +521,11 @@ const Fleet = () => {
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="age" className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
+              <TabsList className="grid w-full grid-cols-4">
                 <TabsTrigger value="age">Fleet Age</TabsTrigger>
                 <TabsTrigger value="costs">Maintenance Costs</TabsTrigger>
                 <TabsTrigger value="incidents">Incidents</TabsTrigger>
+                <TabsTrigger value="databricks">Databricks</TabsTrigger>
               </TabsList>
 
               <TabsContent value="age" className="space-y-4">
@@ -504,6 +620,10 @@ const Fleet = () => {
                     </LineChart>
                   </ResponsiveContainer>
                 </ChartContainer>
+              </TabsContent>
+
+              <TabsContent value="databricks" className="space-y-4">
+                <DatabricksQuerySection />
               </TabsContent>
             </Tabs>
           </CardContent>
