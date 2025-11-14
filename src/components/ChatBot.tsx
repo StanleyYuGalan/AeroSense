@@ -6,8 +6,8 @@ import { MessageCircle, X, Send } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
 
-const GEMINI_API_KEY = "AIzaSyBZnXrbN1hE_yYqoBb4dtpTtMtRtqWhB-A";
-const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent";
+const GEMINI_API_KEY = "AIzaSyBhkp51v3vVNEYMJq-x1-u8QoVT4cuXeQ8";
+const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-exp:generateContent";
 
 interface Message {
   role: "user" | "assistant";
@@ -117,17 +117,10 @@ export const ChatBot = () => {
           <ScrollArea className="flex-1 p-4" ref={scrollRef}>
             <div className="space-y-4">
               {messages.map((message, index) => (
-                <div
-                  key={index}
-                  className={`flex ${
-                    message.role === "user" ? "justify-end" : "justify-start"
-                  }`}
-                >
+                <div key={index} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
                   <div
                     className={`max-w-[80%] rounded-lg p-3 ${
-                      message.role === "user"
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-muted text-foreground"
+                      message.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted text-foreground"
                     }`}
                   >
                     <p className="text-sm whitespace-pre-wrap">{message.content}</p>
@@ -158,11 +151,7 @@ export const ChatBot = () => {
                 disabled={isLoading}
                 className="flex-1"
               />
-              <Button
-                onClick={sendMessage}
-                disabled={isLoading || !input.trim()}
-                size="icon"
-              >
+              <Button onClick={sendMessage} disabled={isLoading || !input.trim()} size="icon">
                 <Send className="h-4 w-4" />
               </Button>
             </div>
