@@ -188,7 +188,26 @@ const Fleet = () => {
     <div className="min-h-screen bg-background bg-cover bg-center bg-fixed" style={{ backgroundImage: 'url(/images/background.jpeg)' }}>
       <div className="min-h-screen bg-background/50">
         <Header />
-        <ChatBot />
+        <ChatBot pageContext={{
+          pageName: "Fleet Overview Dashboard",
+          data: {
+            totalAircraft: fleetData.length,
+            operationalAircraft: fleetData.filter(a => a.status === "operational").length,
+            inMaintenance: fleetData.filter(a => a.status === "maintenance").length,
+            scheduled: fleetData.filter(a => a.status === "scheduled").length,
+            totalWarnings: fleetData.reduce((sum, a) => sum + a.warnings, 0),
+            aircraftWithWarnings: aircraftWithWarnings.length,
+            fleet: fleetData.map(a => ({
+              id: a.id,
+              model: a.model,
+              status: a.status,
+              location: a.location,
+              nextMaintenance: a.nextMaintenance,
+              flightHours: a.flightHours,
+              warnings: a.warnings
+            }))
+          }
+        }} />
       
       <main className="container mx-auto px-4 pt-24 pb-12">
         <div className="mb-8">
