@@ -14,14 +14,16 @@ serve(async (req) => {
   try {
     const { action, query, modelEndpoint, inputData } = await req.json();
     
-    let DATABRICKS_HOST = Deno.env.get('DATABRICKS_HOST');
+    let DATABRICKS_HOST_RAW = Deno.env.get('DATABRICKS_HOST') ?? '';
     const DATABRICKS_TOKEN = Deno.env.get('DATABRICKS_TOKEN');
     const DATABRICKS_SQL_WAREHOUSE_ID = Deno.env.get('DATABRICKS_SQL_WAREHOUSE_ID');
 
-    if (!DATABRICKS_HOST || !DATABRICKS_TOKEN) {
+    const hostTrimmed = DATABRICKS_HOST_RAW.trim().replace(/\/+$/, '');
+    if (!hostTrimmed || !DATABRICKS_TOKEN) {
       throw new Error('Databricks credentials not configured');
     }
 
+    let DATABRICKS_HOST = hostTrimmed;
     // Ensure DATABRICKS_HOST has https:// protocol
     if (!DATABRICKS_HOST.startsWith('http://') && !DATABRICKS_HOST.startsWith('https://')) {
       DATABRICKS_HOST = `https://${DATABRICKS_HOST}`;
@@ -80,8 +82,12 @@ serve(async (req) => {
       }
 
       // Call ML model serving endpoint
+      const endpoint = modelEndpoint.startsWith('http://') || modelEndpoint.startsWith('https://')
+        ? modelEndpoint
+        : `${DATABRICKS_HOST}${modelEndpoint.startsWith('/') ? modelEndpoint : '/' + modelEndpoint}`;
+
       const predictResponse = await fetch(
-        `${DATABRICKS_HOST}${modelEndpoint}`,
+        endpoint,
         {
           method: 'POST',
           headers: {
