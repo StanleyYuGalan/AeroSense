@@ -33,7 +33,7 @@ export const WarningCard = () => {
   };
 
   return (
-    <Card className="p-6 bg-card/60 backdrop-blur-sm border-warning/30 shadow-lg">
+    <Card className="p-6 bg-destructive/10 backdrop-blur-sm border-destructive/40 shadow-lg shadow-destructive/10">
       <div className="flex items-center gap-3 mb-6">
         <motion.div 
           className="bg-warning rounded-full p-3"
