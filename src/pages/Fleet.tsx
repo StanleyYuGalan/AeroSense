@@ -6,6 +6,7 @@ import { Plane, AlertTriangle, CheckCircle, Clock, TrendingUp, Wrench, BarChart3
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from "recharts";
+import { ChatBot } from "@/components/ChatBot";
 import a350Image from "@/assets/a350.jpg";
 import a380Image from "@/assets/a380.jpg";
 import boeing777_300Image from "@/assets/777-300er.jpeg";
@@ -187,6 +188,7 @@ const Fleet = () => {
     <div className="min-h-screen bg-background bg-cover bg-center bg-fixed" style={{ backgroundImage: 'url(/images/background.jpeg)' }}>
       <div className="min-h-screen bg-background/50">
         <Header />
+        <ChatBot />
       
       <main className="container mx-auto px-4 pt-24 pb-12">
         <div className="mb-8">
