@@ -941,7 +941,7 @@ const AircraftDetail = () => {
         <Header />
       
       <main className="container mx-auto px-4 pt-24 pb-12">
-        <Link to="/fleet" className="inline-flex items-center gap-2 text-primary hover:underline mb-6">
+        <Link to="/" className="inline-flex items-center gap-2 text-primary hover:underline mb-6">
           <ArrowLeft className="h-4 w-4" />
           Back to Fleet
         </Link>
