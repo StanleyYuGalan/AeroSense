@@ -9,11 +9,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { ArrowLeft, Plane, MapPin, Clock, AlertTriangle, CheckCircle, Wrench, FileText, Calendar, XCircle, ChevronDown, User, ClipboardCheck, Settings, Shield, Lock, Users, Package, Fuel, Gauge, CloudRain, Info } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft, Plane, MapPin, Clock, AlertTriangle, CheckCircle, Wrench, FileText, Calendar, XCircle, ChevronDown, User, ClipboardCheck, Settings, Shield, Lock, Users, Package, Fuel, Gauge, CloudRain, Info, Loader2, Download } from "lucide-react";
+import { toast } from "sonner";
 import a350Image from "@/assets/a350.jpg";
 import a380Image from "@/assets/a380.jpg";
 import boeing777_300Image from "@/assets/777-300er.jpeg";
 import boeing777_200Image from "@/assets/777-200lr.avif";
+
+const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`;
 const aircraftDatabase: Record<string, any> = {
   "A6-EDA": {
     id: "A6-EDA",
@@ -846,6 +850,8 @@ const AircraftDetail = () => {
   const [selectedDocument, setSelectedDocument] = useState<any>(null);
   const [selectedFlight, setSelectedFlight] = useState<typeof recentFlights[0] | null>(null);
   const [selectedWarning, setSelectedWarning] = useState<any>(null);
+  const [generatingReport, setGeneratingReport] = useState(false);
+  const [generatedReport, setGeneratedReport] = useState<string>("");
   const aircraftDocuments = [{
     name: "Airworthiness Certificate",
     date: "Valid until 2025-12-31",
@@ -1063,13 +1069,14 @@ const AircraftDetail = () => {
 
         {/* Tabbed Content */}
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-7">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="systems">Systems</TabsTrigger>
             <TabsTrigger value="flights">Flight History</TabsTrigger>
             <TabsTrigger value="maintenance">Maintenance</TabsTrigger>
             <TabsTrigger value="documents">Documents</TabsTrigger>
             <TabsTrigger value="specs">Specifications</TabsTrigger>
+            <TabsTrigger value="report">Generate Report</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview">
@@ -1940,6 +1947,164 @@ const AircraftDetail = () => {
                     </div>
                   </div>
                 </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="report">
+            <Card className="bg-card/60 backdrop-blur-sm">
+              <CardHeader>
+                <CardTitle>AI-Generated Aircraft Report</CardTitle>
+                <CardDescription>
+                  Comprehensive analysis and report based on current aircraft data
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {!generatedReport ? (
+                  <div className="flex flex-col items-center justify-center py-12 space-y-4">
+                    <FileText className="h-16 w-16 text-muted-foreground" />
+                    <p className="text-muted-foreground text-center max-w-md">
+                      Generate a comprehensive AI-powered report analyzing this aircraft's current status, maintenance history, system health, and operational metrics.
+                    </p>
+                    <Button
+                      onClick={async () => {
+                        setGeneratingReport(true);
+                        try {
+                          const reportPrompt = `Generate a comprehensive aircraft status report for ${aircraft.id} (${aircraft.model}). Include executive summary, current operational status, system health analysis, maintenance status and recommendations, flight history insights, and any warnings or concerns. Use the following data: ${JSON.stringify({
+                            aircraft: {
+                              id: aircraft.id,
+                              model: aircraft.model,
+                              status: aircraft.status,
+                              location: aircraft.location,
+                              flightHours: aircraft.flightHours,
+                              cycles: aircraft.cycles,
+                              manufactured: aircraft.manufactured,
+                              deliveryDate: aircraft.deliveryDate,
+                              serialNumber: aircraft.serialNumber,
+                              engines: aircraft.engines,
+                              warnings: aircraft.warnings,
+                              warningDetails: aircraft.warningDetails
+                            }
+                          })}. Format the report professionally with clear sections and actionable insights.`;
+
+                          const response = await fetch(CHAT_URL, {
+                            method: "POST",
+                            headers: {
+                              "Content-Type": "application/json",
+                              Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+                            },
+                            body: JSON.stringify({
+                              messages: [{ role: "user", content: reportPrompt }],
+                              pageContext: {
+                                pageName: "Aircraft Detail - Generate Report",
+                                data: { aircraftId: aircraft.id }
+                              }
+                            }),
+                          });
+
+                          if (!response.ok) {
+                            throw new Error("Failed to generate report");
+                          }
+
+                          if (!response.body) throw new Error("No response body");
+
+                          const reader = response.body.getReader();
+                          const decoder = new TextDecoder();
+                          let textBuffer = "";
+                          let streamDone = false;
+                          let reportSoFar = "";
+
+                          while (!streamDone) {
+                            const { done, value } = await reader.read();
+                            if (done) break;
+                            textBuffer += decoder.decode(value, { stream: true });
+
+                            let newlineIndex: number;
+                            while ((newlineIndex = textBuffer.indexOf("\n")) !== -1) {
+                              let line = textBuffer.slice(0, newlineIndex);
+                              textBuffer = textBuffer.slice(newlineIndex + 1);
+
+                              if (line.endsWith("\r")) line = line.slice(0, -1);
+                              if (line.startsWith(":") || line.trim() === "") continue;
+                              if (!line.startsWith("data: ")) continue;
+
+                              const jsonStr = line.slice(6).trim();
+                              if (jsonStr === "[DONE]") {
+                                streamDone = true;
+                                break;
+                              }
+
+                              try {
+                                const parsed = JSON.parse(jsonStr);
+                                const content = parsed.choices?.[0]?.delta?.content as string | undefined;
+                                if (content) {
+                                  reportSoFar += content;
+                                  setGeneratedReport(reportSoFar);
+                                }
+                              } catch {
+                                textBuffer = line + "\n" + textBuffer;
+                                break;
+                              }
+                            }
+                          }
+
+                          toast.success("Report generated successfully!");
+                        } catch (error) {
+                          console.error("Error generating report:", error);
+                          toast.error("Failed to generate report. Please try again.");
+                        } finally {
+                          setGeneratingReport(false);
+                        }
+                      }}
+                      disabled={generatingReport}
+                      size="lg"
+                    >
+                      {generatingReport ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Generating Report...
+                        </>
+                      ) : (
+                        <>
+                          <FileText className="h-4 w-4 mr-2" />
+                          Generate Report
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="flex justify-end gap-2">
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          setGeneratedReport("");
+                        }}
+                      >
+                        Generate New Report
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          const blob = new Blob([generatedReport], { type: "text/plain" });
+                          const url = URL.createObjectURL(blob);
+                          const a = document.createElement("a");
+                          a.href = url;
+                          a.download = `${aircraft.id}-report-${new Date().toISOString().split("T")[0]}.txt`;
+                          a.click();
+                          URL.revokeObjectURL(url);
+                          toast.success("Report downloaded!");
+                        }}
+                      >
+                        <Download className="h-4 w-4 mr-2" />
+                        Download Report
+                      </Button>
+                    </div>
+                    <div className="prose prose-sm max-w-none bg-background/50 p-6 rounded-lg border whitespace-pre-wrap">
+                      {generatedReport}
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
