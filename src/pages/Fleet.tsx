@@ -217,7 +217,7 @@ const Fleet = () => {
 
         {/* Active Warnings Section */}
         {aircraftWithWarnings.length > 0 && (
-          <Card className="mb-8 bg-destructive/20 backdrop-blur-lg border-destructive/50 shadow-lg shadow-destructive/10">
+          <Card className="mb-8 bg-card/40 backdrop-blur-lg border-border/30">
             <CardHeader>
               <div className="flex items-center gap-2">
                 <AlertTriangle className="h-6 w-6 text-warning" />
