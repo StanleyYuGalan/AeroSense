@@ -13,7 +13,14 @@ interface Message {
   content: string;
 }
 
-export const ChatBot = () => {
+interface ChatBotProps {
+  pageContext?: {
+    pageName: string;
+    data?: any;
+  };
+}
+
+export const ChatBot = ({ pageContext }: ChatBotProps = {}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -59,7 +66,10 @@ export const ChatBot = () => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
-        body: JSON.stringify({ messages: currentMessages }),
+        body: JSON.stringify({ 
+          messages: currentMessages,
+          pageContext 
+        }),
       });
 
       if (!resp.ok) {
