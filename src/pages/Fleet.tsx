@@ -217,7 +217,7 @@ const Fleet = () => {
 
         {/* Active Warnings Section */}
         {aircraftWithWarnings.length > 0 && (
-          <Card className="mb-8 bg-destructive/10 backdrop-blur-lg border-warning/50">
+          <Card className="mb-8 bg-destructive/20 backdrop-blur-lg border-destructive/50 shadow-lg shadow-destructive/10">
             <CardHeader>
               <div className="flex items-center gap-2">
                 <AlertTriangle className="h-6 w-6 text-warning" />
@@ -231,8 +231,8 @@ const Fleet = () => {
               <div className="space-y-2">
                 {aircraftWithWarnings.map((aircraft) => (
                   <Link key={aircraft.id} to={`/aircraft/${aircraft.id}`}>
-                    <div className="flex items-center gap-4 p-4 bg-card/40 backdrop-blur-sm border border-border/30 rounded-lg hover:border-warning/50 hover:bg-warning/5 transition-all cursor-pointer group">
-                      <div className="flex items-center justify-center w-10 h-10 bg-warning/20 rounded-lg group-hover:bg-warning/30 transition-colors">
+                    <div className="flex items-center gap-4 p-4 bg-destructive/10 backdrop-blur-sm border border-destructive/40 rounded-lg hover:border-destructive/60 hover:bg-destructive/20 transition-all cursor-pointer group">
+                      <div className="flex items-center justify-center w-10 h-10 bg-destructive/30 rounded-lg group-hover:bg-destructive/40 transition-colors">
                         <AlertTriangle className="h-5 w-5 text-warning" />
                       </div>
                       
