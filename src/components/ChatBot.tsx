@@ -7,7 +7,7 @@ import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
 
 const GEMINI_API_KEY = "AIzaSyBhkp51v3vVNEYMJq-x1-u8QoVT4cuXeQ8";
-const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-exp:generateContent";
+const GEMINI_API_URL = "https://generativelanguage.googleapis.com";
 
 interface Message {
   role: "user" | "assistant";
