@@ -1,6 +1,7 @@
-import { Menu, Plane, Grid3x3 } from "lucide-react";
+import { Menu, Grid3x3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import logo from "@/assets/aerosense-logo.png";
 
 export const Header = () => {
   return (
@@ -11,8 +12,7 @@ export const Header = () => {
             <Menu className="h-6 w-6" />
           </Button>
           <Link to="/" className="flex items-center gap-2">
-            <Plane className="h-8 w-8 text-primary" />
-            <h1 className="text-2xl font-bold text-foreground">AeroSense</h1>
+            <img src={logo} alt="AeroSense" className="h-8" />
           </Link>
         </div>
         <Link to="/">
