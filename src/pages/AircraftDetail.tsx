@@ -971,7 +971,6 @@ const AircraftDetail = () => {
           {/* Aircraft Image */}
           <div className="relative h-80 rounded-lg overflow-hidden shadow-xl">
             <img src={aircraft.image} alt={`${aircraft.model} - ${aircraft.id}`} className="w-full h-full object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent" />
           </div>
 
           {/* Aircraft Info */}
