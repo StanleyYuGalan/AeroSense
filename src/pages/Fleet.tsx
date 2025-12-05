@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Plane, AlertTriangle, CheckCircle, Clock, TrendingUp, Wrench, BarChart3, Database, Loader2 } from "lucide-react";
+import { Plane, AlertTriangle, CheckCircle, Clock, TrendingUp, Wrench, BarChart3, Database, Loader2, Play } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from "recharts";
@@ -183,10 +183,47 @@ const availableQueries = [
 
 const DatabricksQuerySection = () => {
   const [queriesVisible, setQueriesVisible] = useState(false);
+  const [loading, setLoading] = useState<string | null>(null);
+  const [queryResults, setQueryResults] = useState<Record<string, any>>({});
+  const DATABRICKS_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/databricks`;
 
   const handleListQueries = () => {
     setQueriesVisible(true);
     toast.success("Available Databricks queries loaded");
+  };
+
+  const handleRunQuery = async (queryId: string) => {
+    setLoading(queryId);
+    try {
+      const response = await fetch(DATABRICKS_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify({
+          action: "run_query",
+          queryId: queryId,
+        }),
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        setQueryResults(prev => ({ ...prev, [queryId]: result }));
+        toast.success("Query executed successfully!");
+      } else {
+        setQueryResults(prev => ({ ...prev, [queryId]: { error: result.error } }));
+        toast.error(`Query failed: ${result.error}`);
+      }
+    } catch (error) {
+      console.error("Query error:", error);
+      const errorMsg = error instanceof Error ? error.message : "Unknown error";
+      setQueryResults(prev => ({ ...prev, [queryId]: { error: errorMsg } }));
+      toast.error("Failed to execute query");
+    } finally {
+      setLoading(null);
+    }
   };
 
   return (
@@ -197,7 +234,7 @@ const DatabricksQuerySection = () => {
           Databricks Queries
         </h4>
         <p className="text-xs text-muted-foreground">
-          Access available queries from your Databricks SQL Warehouse
+          Run queries directly from your Databricks SQL Warehouse
         </p>
       </div>
 
@@ -209,37 +246,72 @@ const DatabricksQuerySection = () => {
       </div>
 
       {queriesVisible && (
-        <Card className="bg-background/50 border-border/30">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm">Available Queries</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {availableQueries.map((query) => (
-              <div 
-                key={query.id} 
-                className="p-3 bg-muted/30 rounded-lg border border-border/30 hover:bg-muted/50 transition-colors"
-              >
+        <div className="space-y-4">
+          {availableQueries.map((query) => (
+            <Card key={query.id} className="bg-background/50 border-border/30">
+              <CardHeader className="pb-3">
                 <div className="flex items-start justify-between gap-3">
-                  <div className="space-y-1 flex-1">
-                    <h5 className="text-sm font-medium text-foreground">{query.name}</h5>
+                  <div className="space-y-1">
+                    <CardTitle className="text-sm">{query.name}</CardTitle>
                     <p className="text-xs text-muted-foreground">{query.description}</p>
                     <p className="text-xs text-muted-foreground/70">ID: {query.id}</p>
                   </div>
-                  <a
-                    href={query.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="shrink-0"
-                  >
-                    <Button variant="outline" size="sm">
-                      Open in Databricks
+                  <div className="flex gap-2">
+                    <Button 
+                      onClick={() => handleRunQuery(query.id)} 
+                      disabled={loading === query.id}
+                      size="sm"
+                    >
+                      {loading === query.id ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Running...
+                        </>
+                      ) : (
+                        <>
+                          <Play className="h-4 w-4 mr-2" />
+                          Run Query
+                        </>
+                      )}
                     </Button>
-                  </a>
+                    <a
+                      href={query.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <Button variant="outline" size="sm">
+                        Open in Databricks
+                      </Button>
+                    </a>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
+              </CardHeader>
+              
+              {queryResults[query.id] && (
+                <CardContent>
+                  {queryResults[query.id].error ? (
+                    <div className="text-destructive text-xs p-3 bg-destructive/10 rounded border border-destructive/20">
+                      <p className="font-semibold mb-1">Error:</p>
+                      <p>{queryResults[query.id].error}</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-xs text-muted-foreground">
+                        <span>Status: {queryResults[query.id].data?.status?.state || "completed"}</span>
+                        {queryResults[query.id].data?.manifest?.total_row_count !== undefined && (
+                          <span>Rows: {queryResults[query.id].data.manifest.total_row_count}</span>
+                        )}
+                      </div>
+                      <pre className="text-xs overflow-auto max-h-[300px] p-3 bg-muted/30 rounded border border-border/30">
+                        {JSON.stringify(queryResults[query.id].data, null, 2)}
+                      </pre>
+                    </div>
+                  )}
+                </CardContent>
+              )}
+            </Card>
+          ))}
+        </div>
       )}
     </div>
   );
