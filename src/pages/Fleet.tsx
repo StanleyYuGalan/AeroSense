@@ -171,47 +171,22 @@ const getStatusBadge = (status: string) => {
   );
 };
 
+// Available Databricks queries
+const availableQueries = [
+  {
+    id: "2342007906512704",
+    name: "Aircraft Maintenance Query",
+    description: "Query scheduled aircraft maintenance data",
+    url: "https://dbc-2c3235ac-9967.cloud.databricks.com/editor/queries/2342007906512704?contextId=sql-editor&o=656789362835105"
+  }
+];
+
 const DatabricksQuerySection = () => {
-  const [queryResult, setQueryResult] = useState<any>(null);
-  const [loading, setLoading] = useState(false);
-  const DATABRICKS_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/databricks`;
+  const [queriesVisible, setQueriesVisible] = useState(false);
 
-  const handleTestQuery = async () => {
-    setLoading(true);
-    setQueryResult(null);
-    
-    try {
-      // Test query to get sample aircraft maintenance data
-      const testQuery = "SELECT aircraft_id, maintenance_type, scheduled_date, status FROM aircraft_maintenance WHERE status = 'scheduled' LIMIT 5";
-      
-      const response = await fetch(DATABRICKS_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-        },
-        body: JSON.stringify({
-          action: "query",
-          query: testQuery,
-        }),
-      });
-
-      const result = await response.json();
-      
-      if (result.success) {
-        setQueryResult(result.data);
-        toast.success("Databricks query executed successfully!");
-      } else {
-        toast.error(`Query failed: ${result.error}`);
-        setQueryResult({ error: result.error });
-      }
-    } catch (error) {
-      console.error("Query error:", error);
-      toast.error("Failed to execute Databricks query");
-      setQueryResult({ error: error instanceof Error ? error.message : "Unknown error" });
-    } finally {
-      setLoading(false);
-    }
+  const handleListQueries = () => {
+    setQueriesVisible(true);
+    toast.success("Available Databricks queries loaded");
   };
 
   return (
@@ -219,66 +194,53 @@ const DatabricksQuerySection = () => {
       <div className="space-y-2">
         <h4 className="text-sm font-medium text-foreground flex items-center gap-2">
           <Database className="h-4 w-4" />
-          Databricks Connection Test
+          Databricks Queries
         </h4>
         <p className="text-xs text-muted-foreground">
-          Query live maintenance data from your Databricks SQL Warehouse
+          Access available queries from your Databricks SQL Warehouse
         </p>
       </div>
 
       <div className="flex gap-2">
-        <Button onClick={handleTestQuery} disabled={loading} size="sm">
-          {loading ? (
-            <>
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              Querying...
-            </>
-          ) : (
-            <>
-              <Database className="h-4 w-4 mr-2" />
-              Run Test Query
-            </>
-          )}
+        <Button onClick={handleListQueries} size="sm">
+          <Database className="h-4 w-4 mr-2" />
+          List Queries
         </Button>
       </div>
 
-      {queryResult && (
+      {queriesVisible && (
         <Card className="bg-background/50 border-border/30">
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm">Query Results</CardTitle>
+            <CardTitle className="text-sm">Available Queries</CardTitle>
           </CardHeader>
-          <CardContent>
-            {queryResult.error ? (
-              <div className="text-destructive text-xs">
-                <p className="font-semibold mb-1">Error:</p>
-                <p>{queryResult.error}</p>
-              </div>
-            ) : (
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
-                  <span>Status: {queryResult.status?.state || "completed"}</span>
-                  {queryResult.manifest?.total_row_count !== undefined && (
-                    <span>Rows: {queryResult.manifest.total_row_count}</span>
-                  )}
+          <CardContent className="space-y-3">
+            {availableQueries.map((query) => (
+              <div 
+                key={query.id} 
+                className="p-3 bg-muted/30 rounded-lg border border-border/30 hover:bg-muted/50 transition-colors"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="space-y-1 flex-1">
+                    <h5 className="text-sm font-medium text-foreground">{query.name}</h5>
+                    <p className="text-xs text-muted-foreground">{query.description}</p>
+                    <p className="text-xs text-muted-foreground/70">ID: {query.id}</p>
+                  </div>
+                  <a
+                    href={query.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="shrink-0"
+                  >
+                    <Button variant="outline" size="sm">
+                      Open in Databricks
+                    </Button>
+                  </a>
                 </div>
-                <pre className="text-xs overflow-auto max-h-[300px] p-3 bg-muted/30 rounded border">
-                  {JSON.stringify(queryResult, null, 2)}
-                </pre>
               </div>
-            )}
+            ))}
           </CardContent>
         </Card>
       )}
-
-      <div className="p-3 bg-primary/5 border border-primary/20 rounded-lg text-xs">
-        <p className="text-foreground mb-1 font-semibold">Test Query:</p>
-        <code className="text-muted-foreground">
-          SELECT aircraft_id, maintenance_type, scheduled_date, status 
-          FROM aircraft_maintenance 
-          WHERE status = 'scheduled' 
-          LIMIT 5
-        </code>
-      </div>
     </div>
   );
 };
