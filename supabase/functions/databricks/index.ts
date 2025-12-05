@@ -31,6 +31,75 @@ serve(async (req) => {
 
     console.log(`Databricks action: ${action}`);
 
+    // Handle running a saved query by ID
+    if (action === 'run_query') {
+      const { queryId } = await req.json().catch(() => ({}));
+      const parsedQueryId = queryId || query; // Allow queryId from body or use query param
+      
+      if (!parsedQueryId) {
+        throw new Error('queryId is required for action: run_query');
+      }
+
+      // Get query details first
+      const getQueryResponse = await fetch(
+        `${DATABRICKS_HOST}/api/2.0/sql/queries/${parsedQueryId}`,
+        {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${DATABRICKS_TOKEN}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (!getQueryResponse.ok) {
+        const errorText = await getQueryResponse.text();
+        console.error('Failed to get query:', errorText);
+        throw new Error(`Failed to get query: ${getQueryResponse.status}`);
+      }
+
+      const queryDetails = await getQueryResponse.json();
+      console.log('Query details retrieved:', queryDetails.name);
+
+      // Now execute the query
+      if (!DATABRICKS_SQL_WAREHOUSE_ID) {
+        throw new Error('SQL Warehouse ID not configured');
+      }
+
+      const executeResponse = await fetch(
+        `${DATABRICKS_HOST}/api/2.0/sql/statements`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${DATABRICKS_TOKEN}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            warehouse_id: DATABRICKS_SQL_WAREHOUSE_ID,
+            statement: queryDetails.query,
+            wait_timeout: '30s',
+          }),
+        }
+      );
+
+      if (!executeResponse.ok) {
+        const errorText = await executeResponse.text();
+        console.error('Databricks SQL error:', errorText);
+        throw new Error(`Databricks SQL query failed: ${executeResponse.status}`);
+      }
+
+      const result = await executeResponse.json();
+      console.log('Saved query executed successfully');
+
+      return new Response(JSON.stringify({ 
+        success: true, 
+        queryName: queryDetails.name,
+        data: result 
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     // Handle SQL Query
     if (action === 'query') {
       if (!query) {
