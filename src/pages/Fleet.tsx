@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Plane, AlertTriangle, CheckCircle, Clock, TrendingUp, Wrench, BarChart3, Database, Loader2, Play } from "lucide-react";
+import { Plane, AlertTriangle, CheckCircle, Clock, TrendingUp, Wrench, BarChart3, Database, Loader2, Play, Brain } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from "recharts";
@@ -186,6 +186,7 @@ const DatabricksQuerySection = () => {
   const [customSql, setCustomSql] = useState("");
   const [loading, setLoading] = useState<string | null>(null);
   const [queryResults, setQueryResults] = useState<Record<string, any>>({});
+  const [predictionResult, setPredictionResult] = useState<any>(null);
   const DATABRICKS_QUERY_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/databricks-query`;
 
   const handleRunQuery = async (queryId: string, sql: string) => {
@@ -224,8 +225,130 @@ const DatabricksQuerySection = () => {
     }
   };
 
+  const handleRunPrediction = async () => {
+    setLoading("prediction");
+    setPredictionResult(null);
+    
+    try {
+      const inputData = {
+        dataframe_records: [{
+          "Accel Lat": -0.0146,
+          "Accel Long": 0.031,
+          "Accel Vert": 0.96,
+          "Airspeed Comp-L+R": 265.75,
+          "Altitude Press-L+R": 34015.0,
+          "Pitch-L+R": 1.01,
+          "Roll-L+R": -0.13,
+          "Vertical Speed-L&R": 264.0,
+          "Ground Spd-L": 540.5
+        }]
+      };
+
+      const response = await fetch(DATABRICKS_QUERY_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify({
+          action: "predict",
+          modelEndpoint: "/serving-endpoints/flight-clustering-endpoint/invocations",
+          inputData,
+        }),
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        setPredictionResult({ success: true, data: result.prediction });
+        toast.success("Prediction completed successfully!");
+      } else {
+        setPredictionResult({ success: false, error: result.error, details: result.details });
+        toast.error(`Prediction failed: ${result.error}`);
+      }
+    } catch (error) {
+      console.error("Prediction error:", error);
+      const errorMsg = error instanceof Error ? error.message : "Unknown error";
+      setPredictionResult({ success: false, error: errorMsg });
+      toast.error("Failed to get prediction");
+    } finally {
+      setLoading(null);
+    }
+  };
+
   return (
     <div className="space-y-6">
+      {/* ML Model Prediction Section */}
+      <Card className="bg-background/50 border-border/30">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm flex items-center gap-2">
+            <Brain className="h-4 w-4" />
+            Flight Clustering Model
+          </CardTitle>
+          <p className="text-xs text-muted-foreground">
+            Run the flight-clustering-endpoint ML model with sample flight data
+          </p>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="text-xs text-muted-foreground bg-muted/30 p-3 rounded border border-border/30">
+            <p className="font-medium mb-2">Sample Input Data:</p>
+            <pre className="overflow-x-auto">
+{`{
+  "Accel Lat": -0.0146,
+  "Accel Long": 0.031,
+  "Accel Vert": 0.96,
+  "Airspeed Comp-L+R": 265.75,
+  "Altitude Press-L+R": 34015.0,
+  "Pitch-L+R": 1.01,
+  "Roll-L+R": -0.13,
+  "Vertical Speed-L&R": 264.0,
+  "Ground Spd-L": 540.5
+}`}
+            </pre>
+          </div>
+          <Button 
+            onClick={handleRunPrediction} 
+            disabled={loading === "prediction"}
+            size="sm"
+          >
+            {loading === "prediction" ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Running Model...
+              </>
+            ) : (
+              <>
+                <Brain className="h-4 w-4 mr-2" />
+                Run Prediction
+              </>
+            )}
+          </Button>
+          
+          {predictionResult && (
+            <div className="mt-4">
+              {predictionResult.error ? (
+                <div className="text-destructive text-xs p-3 bg-destructive/10 rounded border border-destructive/20">
+                  <p className="font-semibold mb-1">Error:</p>
+                  <p>{predictionResult.error}</p>
+                  {predictionResult.details && (
+                    <pre className="mt-2 text-xs overflow-auto">
+                      {JSON.stringify(predictionResult.details, null, 2)}
+                    </pre>
+                  )}
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <div className="text-xs text-muted-foreground font-medium">Prediction Result:</div>
+                  <pre className="text-xs overflow-auto max-h-[300px] p-3 bg-muted/30 rounded border border-border/30">
+                    {JSON.stringify(predictionResult.data, null, 2)}
+                  </pre>
+                </div>
+              )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       {/* Custom SQL Query Input */}
       <Card className="bg-background/50 border-border/30">
         <CardHeader className="pb-3">
