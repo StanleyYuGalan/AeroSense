@@ -23,7 +23,7 @@ serve(async (req) => {
 
     const DATABRICKS_HOST = Deno.env.get('DATABRICKS_HOST');
     const DATABRICKS_TOKEN = Deno.env.get('DATABRICKS_TOKEN');
-    const DATABRICKS_SQL_WAREHOUSE_ID = Deno.env.get('DATABRICKS_SQL_WAREHOUSE_ID');
+    let DATABRICKS_SQL_WAREHOUSE_ID = Deno.env.get('DATABRICKS_SQL_WAREHOUSE_ID');
 
     if (!DATABRICKS_HOST || !DATABRICKS_TOKEN || !DATABRICKS_SQL_WAREHOUSE_ID) {
       console.error("Missing Databricks credentials");
@@ -31,6 +31,15 @@ serve(async (req) => {
         JSON.stringify({ success: false, error: "Databricks credentials not configured" }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
+    }
+
+    // Extract warehouse ID if a full URL was provided
+    if (DATABRICKS_SQL_WAREHOUSE_ID.includes('/')) {
+      const match = DATABRICKS_SQL_WAREHOUSE_ID.match(/warehouses\/([a-f0-9]+)/);
+      if (match) {
+        DATABRICKS_SQL_WAREHOUSE_ID = match[1];
+        console.log("Extracted warehouse ID:", DATABRICKS_SQL_WAREHOUSE_ID);
+      }
     }
 
     console.log("Executing SQL query:", query);
