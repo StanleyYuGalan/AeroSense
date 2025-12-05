@@ -12,7 +12,7 @@ serve(async (req) => {
   }
 
   try {
-    const { action, query, modelEndpoint, inputData } = await req.json();
+    const { action, query, queryId, modelEndpoint, inputData } = await req.json();
     
     let DATABRICKS_HOST_RAW = Deno.env.get('DATABRICKS_HOST') ?? '';
     const DATABRICKS_TOKEN = Deno.env.get('DATABRICKS_TOKEN');
@@ -33,7 +33,6 @@ serve(async (req) => {
 
     // Handle running a saved query by ID
     if (action === 'run_query') {
-      const { queryId } = await req.json().catch(() => ({}));
       const parsedQueryId = queryId || query; // Allow queryId from body or use query param
       
       if (!parsedQueryId) {
