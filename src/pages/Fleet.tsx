@@ -171,12 +171,13 @@ const getStatusBadge = (status: string) => {
   );
 };
 
-// Available Databricks queries
+// Available Databricks queries - storing SQL directly for execution
 const availableQueries = [
   {
     id: "2342007906512704",
     name: "Aircraft Maintenance Query",
     description: "Query scheduled aircraft maintenance data",
+    sql: "SELECT aircraft_id, maintenance_type, scheduled_date, status FROM aircraft_maintenance WHERE status = 'scheduled' LIMIT 10",
     url: "https://dbc-2c3235ac-9967.cloud.databricks.com/editor/queries/2342007906512704?contextId=sql-editor&o=656789362835105"
   }
 ];
@@ -192,7 +193,7 @@ const DatabricksQuerySection = () => {
     toast.success("Available Databricks queries loaded");
   };
 
-  const handleRunQuery = async (queryId: string) => {
+  const handleRunQuery = async (queryId: string, sql: string) => {
     setLoading(queryId);
     try {
       const response = await fetch(DATABRICKS_URL, {
@@ -202,8 +203,8 @@ const DatabricksQuerySection = () => {
           Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
         body: JSON.stringify({
-          action: "run_query",
-          queryId: queryId,
+          action: "query",
+          query: sql,
         }),
       });
 
@@ -258,7 +259,7 @@ const DatabricksQuerySection = () => {
                   </div>
                   <div className="flex gap-2">
                     <Button 
-                      onClick={() => handleRunQuery(query.id)} 
+                      onClick={() => handleRunQuery(query.id, query.sql)} 
                       disabled={loading === query.id}
                       size="sm"
                     >
