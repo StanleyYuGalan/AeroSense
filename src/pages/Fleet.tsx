@@ -252,7 +252,7 @@ const DatabricksQuerySection = () => {
         },
         body: JSON.stringify({
           action: "predict",
-          modelEndpoint: "/serving-endpoints/flight-clustering-endpoint/invocations",
+          modelEndpoint: "/serving-endpoints/aerosense-k-means/invocations",
           inputData,
         }),
       });
