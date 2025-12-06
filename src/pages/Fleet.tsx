@@ -345,7 +345,7 @@ const DatabricksQuerySection = () => {
           Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
         body: JSON.stringify({ 
-          query: "SELECT * FROM flight_anomaly_view LIMIT 1000" 
+          query: "SELECT * FROM flight_anomaly_view" 
         }),
       });
 
