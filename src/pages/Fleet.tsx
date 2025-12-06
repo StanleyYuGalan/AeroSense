@@ -358,7 +358,7 @@ const DatabricksQuerySection = () => {
           return {
             time: idx,
             anomalyScore,
-            isAnomaly: anomalyScore < 0,
+            isAnomaly: row[2] === "1" || parseInt(row[2]) === 1,
             altitude: parseFloat(row[3]) || 30000 + Math.random() * 10000,
             verticalSpeed: parseFloat(row[4]) || Math.random() * 500 - 250
           };
