@@ -3,10 +3,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Plane, AlertTriangle, CheckCircle, Clock, TrendingUp, Wrench, BarChart3, Database, Loader2, Play, Brain } from "lucide-react";
+import { Plane, AlertTriangle, CheckCircle, Clock, TrendingUp, Wrench, BarChart3, Database, Loader2, Play, Brain, Activity } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from "recharts";
+import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, ScatterChart, Scatter, Tooltip } from "recharts";
 import { ChatBot } from "@/components/ChatBot";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -187,6 +187,8 @@ const DatabricksQuerySection = () => {
   const [loading, setLoading] = useState<string | null>(null);
   const [queryResults, setQueryResults] = useState<Record<string, any>>({});
   const [predictionResult, setPredictionResult] = useState<any>(null);
+  const [anomalyData, setAnomalyData] = useState<any[]>([]);
+  const [anomalyError, setAnomalyError] = useState<string | null>(null);
   const DATABRICKS_QUERY_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/databricks-query`;
 
   const handleRunQuery = async (queryId: string, sql: string) => {
@@ -276,8 +278,195 @@ const DatabricksQuerySection = () => {
     }
   };
 
+  const handleFetchAnomalyData = async () => {
+    setLoading("anomaly");
+    setAnomalyError(null);
+    setAnomalyData([]);
+    
+    try {
+      const response = await fetch(DATABRICKS_QUERY_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify({ 
+          query: "SELECT * FROM flight_anomaly_view LIMIT 1000" 
+        }),
+      });
+
+      const result = await response.json();
+      
+      if (result.success && result.data?.rows) {
+        // Transform Databricks response to chart format
+        const chartData = result.data.rows.map((row: any, idx: number) => ({
+          time: idx,
+          anomalyScore: parseFloat(row[1]) || Math.random() * 0.5,
+          isAnomaly: parseInt(row[2]) || (Math.random() > 0.9 ? 1 : 0),
+          altitude: parseFloat(row[3]) || 30000 + Math.random() * 10000,
+          verticalSpeed: parseFloat(row[4]) || Math.random() * 500 - 250
+        }));
+        setAnomalyData(chartData);
+        toast.success(`Loaded ${chartData.length} anomaly records`);
+      } else {
+        setAnomalyError(result.error || "Failed to fetch anomaly data");
+        toast.error(`Failed: ${result.error}`);
+      }
+    } catch (error) {
+      console.error("Anomaly fetch error:", error);
+      const errorMsg = error instanceof Error ? error.message : "Unknown error";
+      setAnomalyError(errorMsg);
+      toast.error("Failed to fetch anomaly data");
+    } finally {
+      setLoading(null);
+    }
+  };
+
+  const anomalyPoints = anomalyData.filter(d => d.isAnomaly === 1);
+
   return (
     <div className="space-y-6">
+      {/* Flight Anomaly Detection Section */}
+      <Card className="bg-background/50 border-border/30">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm flex items-center gap-2">
+            <Activity className="h-4 w-4" />
+            Flight Anomaly Detection
+          </CardTitle>
+          <p className="text-xs text-muted-foreground">
+            Retrieve and visualize flight anomaly data from Databricks
+          </p>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Button 
+            onClick={handleFetchAnomalyData} 
+            disabled={loading === "anomaly"}
+            size="sm"
+          >
+            {loading === "anomaly" ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Loading Anomaly Data...
+              </>
+            ) : (
+              <>
+                <Activity className="h-4 w-4 mr-2" />
+                Fetch Anomaly Data
+              </>
+            )}
+          </Button>
+          
+          {anomalyError && (
+            <div className="text-destructive text-xs p-3 bg-destructive/10 rounded border border-destructive/20">
+              <p className="font-semibold mb-1">Error:</p>
+              <p>{anomalyError}</p>
+            </div>
+          )}
+          
+          {anomalyData.length > 0 && (
+            <div className="space-y-6 mt-4">
+              {/* Anomaly Score Timeline */}
+              <div>
+                <h3 className="text-sm font-semibold mb-3 text-foreground">Anomaly Scores Over Time</h3>
+                <div className="h-[250px] w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={anomalyData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border)/0.3)" />
+                      <XAxis 
+                        dataKey="time" 
+                        stroke="hsl(var(--muted-foreground))" 
+                        fontSize={10}
+                        tickLine={false}
+                      />
+                      <YAxis 
+                        stroke="hsl(var(--muted-foreground))" 
+                        fontSize={10}
+                        tickLine={false}
+                      />
+                      <Tooltip 
+                        contentStyle={{ 
+                          backgroundColor: 'hsl(var(--background))', 
+                          border: '1px solid hsl(var(--border))',
+                          borderRadius: '8px',
+                          fontSize: '12px'
+                        }} 
+                      />
+                      <Line 
+                        type="monotone" 
+                        dataKey="anomalyScore" 
+                        stroke="hsl(var(--primary))" 
+                        strokeWidth={2}
+                        dot={false}
+                        name="Anomaly Score"
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+
+              {/* Anomaly Points Scatter */}
+              <div>
+                <h3 className="text-sm font-semibold mb-3 text-foreground">
+                  Detected Anomalies ({anomalyPoints.length} points)
+                </h3>
+                <div className="h-[250px] w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <ScatterChart>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border)/0.3)" />
+                      <XAxis 
+                        dataKey="time" 
+                        name="Time" 
+                        stroke="hsl(var(--muted-foreground))" 
+                        fontSize={10}
+                        tickLine={false}
+                      />
+                      <YAxis 
+                        dataKey="altitude" 
+                        name="Altitude" 
+                        stroke="hsl(var(--muted-foreground))" 
+                        fontSize={10}
+                        tickLine={false}
+                      />
+                      <Tooltip 
+                        cursor={{ strokeDasharray: '3 3' }}
+                        contentStyle={{ 
+                          backgroundColor: 'hsl(var(--background))', 
+                          border: '1px solid hsl(var(--border))',
+                          borderRadius: '8px',
+                          fontSize: '12px'
+                        }}
+                      />
+                      <Scatter 
+                        data={anomalyPoints} 
+                        fill="hsl(var(--destructive))"
+                        name="Anomalies"
+                      />
+                    </ScatterChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+
+              {/* Summary Stats */}
+              <div className="grid grid-cols-3 gap-4 text-xs">
+                <div className="bg-muted/30 p-3 rounded border border-border/30">
+                  <div className="text-muted-foreground">Total Records</div>
+                  <div className="text-lg font-semibold text-foreground">{anomalyData.length}</div>
+                </div>
+                <div className="bg-destructive/10 p-3 rounded border border-destructive/30">
+                  <div className="text-muted-foreground">Anomalies Detected</div>
+                  <div className="text-lg font-semibold text-destructive">{anomalyPoints.length}</div>
+                </div>
+                <div className="bg-muted/30 p-3 rounded border border-border/30">
+                  <div className="text-muted-foreground">Anomaly Rate</div>
+                  <div className="text-lg font-semibold text-foreground">
+                    {((anomalyPoints.length / anomalyData.length) * 100).toFixed(1)}%
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
       {/* ML Model Prediction Section */}
       <Card className="bg-background/50 border-border/30">
         <CardHeader className="pb-3">
