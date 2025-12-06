@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 import { Plane, AlertTriangle, CheckCircle, Clock, TrendingUp, Wrench, BarChart3, Database, Loader2, Play, Brain, Activity } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, ScatterChart, Scatter, Tooltip } from "recharts";
+import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip, ComposedChart, ReferenceLine } from "recharts";
 import { ChatBot } from "@/components/ChatBot";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -182,12 +182,66 @@ const availableQueries = [
   }
 ];
 
+// Types for flight anomaly data
+interface FlightDataPoint {
+  time: number;
+  anomalyScore: number;
+  isAnomaly: boolean;
+  altitude: number | null;
+  verticalSpeed: number | null;
+}
+
+// Custom dot component to render hollow red circles for anomalies only
+const AnomalyDot = (props: any) => {
+  const { cx, cy, payload } = props;
+  if (!payload?.isAnomaly || cx === undefined || cy === undefined) return null;
+  
+  return (
+    <circle
+      cx={cx}
+      cy={cy}
+      r={4}
+      fill="none"
+      stroke="#d62728"
+      strokeWidth={1.5}
+    />
+  );
+};
+
+// Custom legend that matches matplotlib style
+const CustomLegend = ({ items, align = 'left' }: { items: { type: 'line' | 'dash' | 'circle'; color: string; label: string }[]; align?: 'left' | 'right' }) => {
+  return (
+    <div className={`flex gap-4 ${align === 'left' ? 'ml-16' : 'justify-end mr-8'} mb-1`}>
+      {items.map((item, idx) => (
+        <div key={idx} className="flex items-center gap-1.5">
+          {item.type === 'dash' && (
+            <svg width="24" height="10">
+              <line x1="0" y1="5" x2="24" y2="5" stroke={item.color} strokeWidth="1.5" strokeDasharray="5 3" />
+            </svg>
+          )}
+          {item.type === 'circle' && (
+            <svg width="10" height="10">
+              <circle cx="5" cy="5" r="4" fill="none" stroke={item.color} strokeWidth="1.5" />
+            </svg>
+          )}
+          {item.type === 'line' && (
+            <svg width="16" height="10">
+              <line x1="0" y1="5" x2="16" y2="5" stroke={item.color} strokeWidth="1.5" />
+            </svg>
+          )}
+          <span className="text-xs text-muted-foreground">{item.label}</span>
+        </div>
+      ))}
+    </div>
+  );
+};
+
 const DatabricksQuerySection = () => {
   const [customSql, setCustomSql] = useState("");
   const [loading, setLoading] = useState<string | null>(null);
   const [queryResults, setQueryResults] = useState<Record<string, any>>({});
   const [predictionResult, setPredictionResult] = useState<any>(null);
-  const [anomalyData, setAnomalyData] = useState<any[]>([]);
+  const [anomalyData, setAnomalyData] = useState<FlightDataPoint[]>([]);
   const [anomalyError, setAnomalyError] = useState<string | null>(null);
   const DATABRICKS_QUERY_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/databricks-query`;
 
@@ -299,13 +353,16 @@ const DatabricksQuerySection = () => {
       
       if (result.success && result.data?.rows) {
         // Transform Databricks response to chart format
-        const chartData = result.data.rows.map((row: any, idx: number) => ({
-          time: idx,
-          anomalyScore: parseFloat(row[1]) || Math.random() * 0.5,
-          isAnomaly: parseInt(row[2]) || (Math.random() > 0.9 ? 1 : 0),
-          altitude: parseFloat(row[3]) || 30000 + Math.random() * 10000,
-          verticalSpeed: parseFloat(row[4]) || Math.random() * 500 - 250
-        }));
+        const chartData: FlightDataPoint[] = result.data.rows.map((row: any, idx: number) => {
+          const anomalyScore = parseFloat(row[1]) || (Math.random() * 0.35 - 0.15);
+          return {
+            time: idx,
+            anomalyScore,
+            isAnomaly: anomalyScore < 0,
+            altitude: parseFloat(row[3]) || 30000 + Math.random() * 10000,
+            verticalSpeed: parseFloat(row[4]) || Math.random() * 500 - 250
+          };
+        });
         setAnomalyData(chartData);
         toast.success(`Loaded ${chartData.length} anomaly records`);
       } else {
@@ -322,7 +379,7 @@ const DatabricksQuerySection = () => {
     }
   };
 
-  const anomalyPoints = anomalyData.filter(d => d.isAnomaly === 1);
+  const anomalyCount = anomalyData.filter(d => d.isAnomaly).length;
 
   return (
     <div className="space-y-6">
@@ -364,103 +421,156 @@ const DatabricksQuerySection = () => {
           )}
           
           {anomalyData.length > 0 && (
-            <div className="space-y-6 mt-4">
-              {/* Anomaly Score Timeline */}
+            <div className="space-y-4 mt-4 p-4 bg-card rounded-lg border border-border/30">
+              
+              {/* Chart 1: Anomaly Scores Over Time */}
               <div>
-                <h3 className="text-sm font-semibold mb-3 text-foreground">Anomaly Scores Over Time</h3>
-                <div className="h-[250px] w-full">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={anomalyData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border)/0.3)" />
-                      <XAxis 
-                        dataKey="time" 
-                        stroke="hsl(var(--muted-foreground))" 
-                        fontSize={10}
-                        tickLine={false}
-                      />
-                      <YAxis 
-                        stroke="hsl(var(--muted-foreground))" 
-                        fontSize={10}
-                        tickLine={false}
-                      />
-                      <Tooltip 
-                        contentStyle={{ 
-                          backgroundColor: 'hsl(var(--background))', 
-                          border: '1px solid hsl(var(--border))',
-                          borderRadius: '8px',
-                          fontSize: '12px'
-                        }} 
-                      />
-                      <Line 
-                        type="monotone" 
-                        dataKey="anomalyScore" 
-                        stroke="hsl(var(--primary))" 
-                        strokeWidth={2}
-                        dot={false}
-                        name="Anomaly Score"
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
+                <h3 className="text-sm font-medium text-center text-foreground mb-1">
+                  Isolation Forest Anomaly Scores Over Time
+                </h3>
+                <CustomLegend items={[
+                  { type: 'dash', color: '#d62728', label: 'Threshold' },
+                  { type: 'circle', color: '#d62728', label: 'Anomalies' }
+                ]} />
+                <ResponsiveContainer width="100%" height={240}>
+                  <ComposedChart data={anomalyData} margin={{ top: 5, right: 20, left: 50, bottom: 25 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border)/0.5)" />
+                    <XAxis 
+                      dataKey="time" 
+                      tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
+                      tickLine={{ stroke: 'hsl(var(--muted-foreground))' }}
+                      axisLine={{ stroke: 'hsl(var(--muted-foreground))' }}
+                      label={{ value: 'Time Index (seconds)', position: 'bottom', offset: 10, style: { fontSize: 11, fill: 'hsl(var(--muted-foreground))' } }}
+                    />
+                    <YAxis 
+                      tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
+                      tickLine={{ stroke: 'hsl(var(--muted-foreground))' }}
+                      axisLine={{ stroke: 'hsl(var(--muted-foreground))' }}
+                      domain={[-0.15, 0.20]}
+                      ticks={[-0.15, -0.10, -0.05, 0.00, 0.05, 0.10, 0.15, 0.20]}
+                      tickFormatter={(v) => v.toFixed(2)}
+                      label={{ value: 'Anomaly Score', angle: -90, position: 'insideLeft', offset: -35, style: { fontSize: 11, fill: 'hsl(var(--muted-foreground))' } }}
+                    />
+                    <Tooltip 
+                      contentStyle={{ backgroundColor: 'hsl(var(--background))', border: '1px solid hsl(var(--border))', fontSize: 11, borderRadius: '8px' }}
+                      formatter={(value: number) => [value.toFixed(4), 'Score']}
+                    />
+                    <ReferenceLine 
+                      y={0} 
+                      stroke="#d62728" 
+                      strokeDasharray="5 3" 
+                      strokeWidth={1.5}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="anomalyScore"
+                      stroke="#7fb3d5"
+                      strokeWidth={0.5}
+                      dot={<AnomalyDot />}
+                      isAnimationActive={false}
+                    />
+                  </ComposedChart>
+                </ResponsiveContainer>
               </div>
 
-              {/* Anomaly Points Scatter */}
+              {/* Chart 2: Altitude with Anomalies */}
               <div>
-                <h3 className="text-sm font-semibold mb-3 text-foreground">
-                  Detected Anomalies ({anomalyPoints.length} points)
+                <h3 className="text-sm font-medium text-center text-foreground mb-1">
+                  Altitude with Anomalies Highlighted
                 </h3>
-                <div className="h-[250px] w-full">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <ScatterChart>
-                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border)/0.3)" />
-                      <XAxis 
-                        dataKey="time" 
-                        name="Time" 
-                        stroke="hsl(var(--muted-foreground))" 
-                        fontSize={10}
-                        tickLine={false}
-                      />
-                      <YAxis 
-                        dataKey="altitude" 
-                        name="Altitude" 
-                        stroke="hsl(var(--muted-foreground))" 
-                        fontSize={10}
-                        tickLine={false}
-                      />
-                      <Tooltip 
-                        cursor={{ strokeDasharray: '3 3' }}
-                        contentStyle={{ 
-                          backgroundColor: 'hsl(var(--background))', 
-                          border: '1px solid hsl(var(--border))',
-                          borderRadius: '8px',
-                          fontSize: '12px'
-                        }}
-                      />
-                      <Scatter 
-                        data={anomalyPoints} 
-                        fill="hsl(var(--destructive))"
-                        name="Anomalies"
-                      />
-                    </ScatterChart>
-                  </ResponsiveContainer>
-                </div>
+                <CustomLegend items={[
+                  { type: 'circle', color: '#d62728', label: 'Anomalies' }
+                ]} />
+                <ResponsiveContainer width="100%" height={240}>
+                  <ComposedChart data={anomalyData} margin={{ top: 5, right: 20, left: 50, bottom: 25 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border)/0.5)" />
+                    <XAxis 
+                      dataKey="time"
+                      tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
+                      tickLine={{ stroke: 'hsl(var(--muted-foreground))' }}
+                      axisLine={{ stroke: 'hsl(var(--muted-foreground))' }}
+                    />
+                    <YAxis 
+                      tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
+                      tickLine={{ stroke: 'hsl(var(--muted-foreground))' }}
+                      axisLine={{ stroke: 'hsl(var(--muted-foreground))' }}
+                      domain={[10000, 35000]}
+                      ticks={[10000, 15000, 20000, 25000, 30000, 35000]}
+                      label={{ value: 'Altitude (ft)', angle: -90, position: 'insideLeft', offset: -35, style: { fontSize: 11, fill: 'hsl(var(--muted-foreground))' } }}
+                    />
+                    <Tooltip 
+                      contentStyle={{ backgroundColor: 'hsl(var(--background))', border: '1px solid hsl(var(--border))', fontSize: 11, borderRadius: '8px' }}
+                      formatter={(value: number) => [value?.toFixed(0) + ' ft', 'Altitude']}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="altitude"
+                      stroke="#7fb3d5"
+                      strokeWidth={0.5}
+                      dot={<AnomalyDot />}
+                      isAnimationActive={false}
+                    />
+                  </ComposedChart>
+                </ResponsiveContainer>
+              </div>
+
+              {/* Chart 3: Vertical Speed with Anomalies */}
+              <div>
+                <h3 className="text-sm font-medium text-center text-foreground mb-1">
+                  Vertical Speed with Anomalies Highlighted
+                </h3>
+                <CustomLegend items={[
+                  { type: 'circle', color: '#d62728', label: 'Anomalies' }
+                ]} align="right" />
+                <ResponsiveContainer width="100%" height={240}>
+                  <ComposedChart data={anomalyData} margin={{ top: 5, right: 20, left: 50, bottom: 25 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border)/0.5)" />
+                    <XAxis 
+                      dataKey="time"
+                      tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
+                      tickLine={{ stroke: 'hsl(var(--muted-foreground))' }}
+                      axisLine={{ stroke: 'hsl(var(--muted-foreground))' }}
+                      label={{ value: 'Time Index (seconds)', position: 'bottom', offset: 10, style: { fontSize: 11, fill: 'hsl(var(--muted-foreground))' } }}
+                    />
+                    <YAxis 
+                      tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
+                      tickLine={{ stroke: 'hsl(var(--muted-foreground))' }}
+                      axisLine={{ stroke: 'hsl(var(--muted-foreground))' }}
+                      domain={[-2000, 1500]}
+                      ticks={[-2000, -1500, -1000, -500, 0, 500, 1000, 1500]}
+                      label={{ value: 'Vertical Speed (ft/min)', angle: -90, position: 'insideLeft', offset: -35, style: { fontSize: 11, fill: 'hsl(var(--muted-foreground))' } }}
+                    />
+                    <Tooltip 
+                      contentStyle={{ backgroundColor: 'hsl(var(--background))', border: '1px solid hsl(var(--border))', fontSize: 11, borderRadius: '8px' }}
+                      formatter={(value: number) => [value?.toFixed(0) + ' ft/min', 'Vertical Speed']}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="verticalSpeed"
+                      stroke="#7fb3d5"
+                      strokeWidth={0.5}
+                      dot={<AnomalyDot />}
+                      isAnimationActive={false}
+                    />
+                  </ComposedChart>
+                </ResponsiveContainer>
               </div>
 
               {/* Summary Stats */}
-              <div className="grid grid-cols-3 gap-4 text-xs">
-                <div className="bg-muted/30 p-3 rounded border border-border/30">
-                  <div className="text-muted-foreground">Total Records</div>
-                  <div className="text-lg font-semibold text-foreground">{anomalyData.length}</div>
+              <div className="grid grid-cols-3 gap-4 pt-4">
+                <div className="border border-border/30 rounded-lg p-3 bg-muted/30 text-center">
+                  <div className="text-2xl font-bold text-foreground">{anomalyData.length.toLocaleString()}</div>
+                  <div className="text-xs text-muted-foreground">Total Data Points</div>
                 </div>
-                <div className="bg-destructive/10 p-3 rounded border border-destructive/30">
-                  <div className="text-muted-foreground">Anomalies Detected</div>
-                  <div className="text-lg font-semibold text-destructive">{anomalyPoints.length}</div>
+                <div className="border border-destructive/30 rounded-lg p-3 bg-destructive/10 text-center">
+                  <div className="text-2xl font-bold text-destructive">{anomalyCount.toLocaleString()}</div>
+                  <div className="text-xs text-muted-foreground">Anomalies Detected</div>
                 </div>
-                <div className="bg-muted/30 p-3 rounded border border-border/30">
-                  <div className="text-muted-foreground">Anomaly Rate</div>
-                  <div className="text-lg font-semibold text-foreground">
-                    {((anomalyPoints.length / anomalyData.length) * 100).toFixed(1)}%
+                <div className="border border-primary/30 rounded-lg p-3 bg-primary/10 text-center">
+                  <div className="text-2xl font-bold text-primary">
+                    {((anomalyCount / anomalyData.length) * 100).toFixed(1)}%
                   </div>
+                  <div className="text-xs text-muted-foreground">Anomaly Rate</div>
                 </div>
               </div>
             </div>
