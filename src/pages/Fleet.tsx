@@ -344,16 +344,17 @@ const DatabricksQuerySection = () => {
     const avgAltitude = data.reduce((sum, d) => sum + (d.altitude || 0), 0) / data.length;
     const avgVerticalSpeed = data.reduce((sum, d) => sum + (d.verticalSpeed || 0), 0) / data.length;
     
-    const prompt = `You are a helpful aviation maintenance assistant. Review this flight anomaly data and identify any potential concerns that maintenance crews should look into.
+    const prompt = `Review this flight anomaly detection data and provide maintenance-relevant observations.
 
 Data Summary:
 - Total readings: ${data.length}
-- Anomalies found: ${anomalies.length} (${((anomalies.length / data.length) * 100).toFixed(2)}%)
-- Average anomaly score: ${avgScore.toFixed(4)}
+- Anomalies flagged: ${anomalies.length} (${((anomalies.length / data.length) * 100).toFixed(2)}%)
 - Altitude range: ${Math.min(...data.map(d => d.altitude || 0)).toFixed(0)} - ${Math.max(...data.map(d => d.altitude || 0)).toFixed(0)} ft
 - Vertical speed range: ${Math.min(...data.map(d => d.verticalSpeed || 0)).toFixed(0)} - ${Math.max(...data.map(d => d.verticalSpeed || 0)).toFixed(0)} ft/min
 
-Write 2-4 short bullet points about what maintenance crews should check or be aware of. Use simple, plain language that anyone can understand. Avoid technical jargon.`;
+Key observation: The data shows instances where altitude decreases despite positive vertical airspeed readings, which indicates a potential sensor discrepancy or atmospheric conditions affecting instrument accuracy.
+
+Write 2-3 concise bullet points for maintenance review. Be direct and professional, focusing on actionable observations.`;
 
     try {
       const response = await fetch(CHAT_URL, {
