@@ -243,7 +243,10 @@ const DatabricksQuerySection = () => {
   const [predictionResult, setPredictionResult] = useState<any>(null);
   const [anomalyData, setAnomalyData] = useState<FlightDataPoint[]>([]);
   const [anomalyError, setAnomalyError] = useState<string | null>(null);
+  const [aiAnalysis, setAiAnalysis] = useState<string>("");
+  const [aiAnalysisLoading, setAiAnalysisLoading] = useState(false);
   const DATABRICKS_QUERY_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/databricks-query`;
+  const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`;
 
   const handleRunQuery = async (queryId: string, sql: string) => {
     if (!sql.trim()) {
@@ -332,10 +335,85 @@ const DatabricksQuerySection = () => {
     }
   };
 
+  const runAiAnalysis = async (data: FlightDataPoint[]) => {
+    setAiAnalysisLoading(true);
+    setAiAnalysis("");
+    
+    const anomalies = data.filter(d => d.isAnomaly);
+    const avgScore = data.reduce((sum, d) => sum + d.anomalyScore, 0) / data.length;
+    const avgAltitude = data.reduce((sum, d) => sum + (d.altitude || 0), 0) / data.length;
+    const avgVerticalSpeed = data.reduce((sum, d) => sum + (d.verticalSpeed || 0), 0) / data.length;
+    
+    const prompt = `Analyze this flight anomaly detection data and provide a brief preliminary analysis:
+
+Data Summary:
+- Total data points: ${data.length}
+- Anomalies detected: ${anomalies.length} (${((anomalies.length / data.length) * 100).toFixed(2)}%)
+- Average anomaly score: ${avgScore.toFixed(4)}
+- Average altitude: ${avgAltitude.toFixed(0)} ft
+- Average vertical speed: ${avgVerticalSpeed.toFixed(0)} ft/min
+- Altitude range: ${Math.min(...data.map(d => d.altitude || 0)).toFixed(0)} - ${Math.max(...data.map(d => d.altitude || 0)).toFixed(0)} ft
+- Vertical speed range: ${Math.min(...data.map(d => d.verticalSpeed || 0)).toFixed(0)} - ${Math.max(...data.map(d => d.verticalSpeed || 0)).toFixed(0)} ft/min
+
+Provide a concise analysis covering:
+1. Overall assessment of flight behavior
+2. Anomaly pattern observations
+3. Any potential concerns for maintenance review`;
+
+    try {
+      const response = await fetch(CHAT_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify({
+          messages: [{ role: "user", content: prompt }],
+          pageContext: { pageName: "Fleet Anomaly Analysis", dataType: "flight_anomaly_detection" }
+        }),
+      });
+
+      if (!response.ok || !response.body) {
+        throw new Error("Failed to get AI analysis");
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let analysisText = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        
+        const chunk = decoder.decode(value, { stream: true });
+        const lines = chunk.split("\n");
+        
+        for (const line of lines) {
+          if (line.startsWith("data: ") && line !== "data: [DONE]") {
+            try {
+              const json = JSON.parse(line.slice(6));
+              const content = json.choices?.[0]?.delta?.content;
+              if (content) {
+                analysisText += content;
+                setAiAnalysis(analysisText);
+              }
+            } catch {}
+          }
+        }
+      }
+    } catch (error) {
+      console.error("AI analysis error:", error);
+      setAiAnalysis("Unable to generate AI analysis at this time.");
+    } finally {
+      setAiAnalysisLoading(false);
+    }
+  };
+
   const handleFetchAnomalyData = async () => {
     setLoading("anomaly");
     setAnomalyError(null);
     setAnomalyData([]);
+    setAiAnalysis("");
     
     try {
       const response = await fetch(DATABRICKS_QUERY_URL, {
@@ -365,6 +443,9 @@ const DatabricksQuerySection = () => {
         });
         setAnomalyData(chartData);
         toast.success(`Loaded ${chartData.length} anomaly records`);
+        
+        // Trigger AI analysis
+        runAiAnalysis(chartData);
       } else {
         setAnomalyError(result.error || "Failed to fetch anomaly data");
         toast.error(`Failed: ${result.error}`);
@@ -572,6 +653,29 @@ const DatabricksQuerySection = () => {
                   </div>
                   <div className="text-xs text-muted-foreground">Anomaly Rate</div>
                 </div>
+              </div>
+
+              {/* AI Analysis Section */}
+              <div className="mt-6 border border-primary/30 rounded-lg p-4 bg-primary/5">
+                <div className="flex items-center gap-2 mb-3">
+                  <Brain className="h-5 w-5 text-primary" />
+                  <h3 className="text-sm font-semibold text-foreground">AI Analysis</h3>
+                  {aiAnalysisLoading && (
+                    <Loader2 className="h-4 w-4 animate-spin text-primary ml-2" />
+                  )}
+                </div>
+                {aiAnalysis ? (
+                  <div className="text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed">
+                    {aiAnalysis}
+                  </div>
+                ) : aiAnalysisLoading ? (
+                  <div className="text-sm text-muted-foreground italic">
+                    Orville is analyzing the anomaly data...
+                  </div>
+                ) : null}
+                <p className="text-xs text-muted-foreground/70 mt-4 italic border-t border-border/30 pt-3">
+                  ⚠️ This analysis is AI-powered. Final review by qualified maintenance personnel and aviation engineers is recommended.
+                </p>
               </div>
             </div>
           )}
