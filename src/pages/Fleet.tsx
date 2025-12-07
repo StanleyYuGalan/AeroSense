@@ -344,21 +344,16 @@ const DatabricksQuerySection = () => {
     const avgAltitude = data.reduce((sum, d) => sum + (d.altitude || 0), 0) / data.length;
     const avgVerticalSpeed = data.reduce((sum, d) => sum + (d.verticalSpeed || 0), 0) / data.length;
     
-    const prompt = `Analyze this flight anomaly detection data and provide a brief preliminary analysis:
+    const prompt = `You are a helpful aviation maintenance assistant. Review this flight anomaly data and identify any potential concerns that maintenance crews should look into.
 
 Data Summary:
-- Total data points: ${data.length}
-- Anomalies detected: ${anomalies.length} (${((anomalies.length / data.length) * 100).toFixed(2)}%)
+- Total readings: ${data.length}
+- Anomalies found: ${anomalies.length} (${((anomalies.length / data.length) * 100).toFixed(2)}%)
 - Average anomaly score: ${avgScore.toFixed(4)}
-- Average altitude: ${avgAltitude.toFixed(0)} ft
-- Average vertical speed: ${avgVerticalSpeed.toFixed(0)} ft/min
 - Altitude range: ${Math.min(...data.map(d => d.altitude || 0)).toFixed(0)} - ${Math.max(...data.map(d => d.altitude || 0)).toFixed(0)} ft
 - Vertical speed range: ${Math.min(...data.map(d => d.verticalSpeed || 0)).toFixed(0)} - ${Math.max(...data.map(d => d.verticalSpeed || 0)).toFixed(0)} ft/min
 
-Provide a concise analysis covering:
-1. Overall assessment of flight behavior
-2. Anomaly pattern observations
-3. Any potential concerns for maintenance review`;
+Write 2-4 short bullet points about what maintenance crews should check or be aware of. Use simple, plain language that anyone can understand. Avoid technical jargon.`;
 
     try {
       const response = await fetch(CHAT_URL, {
@@ -659,7 +654,7 @@ Provide a concise analysis covering:
               <div className="mt-6 border border-primary/30 rounded-lg p-4 bg-primary/5">
                 <div className="flex items-center gap-2 mb-3">
                   <Brain className="h-5 w-5 text-primary" />
-                  <h3 className="text-sm font-semibold text-foreground">AI Analysis</h3>
+                  <h3 className="text-sm font-semibold text-foreground">Maintenance Review Notes</h3>
                   {aiAnalysisLoading && (
                     <Loader2 className="h-4 w-4 animate-spin text-primary ml-2" />
                   )}
